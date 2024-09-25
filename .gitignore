@@ -3,6 +3,10 @@
 debug/
 target/
 
+# these should not be commited as they are for local testing purposes
+file-for-upload/
+file-uploaded/
+
 # Remove Cargo.lock from gitignore if creating an executable, leave it for libraries
 # More information here https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html
 Cargo.lock
