@@ -53,5 +53,4 @@ fn main() {
     vec_to_file(file_data, file_name);
     // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
     // file.write_all(&file_data).unwrap();
-    println!("hello");
 }
