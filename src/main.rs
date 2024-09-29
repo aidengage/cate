@@ -1,13 +1,12 @@
-use std::{env, fs};
+use std::fs;
 use std::fs::File;
-use std::io::{Read, Write};
-use std::io;
+use std::io::Write;
 use std::path::Path;
 use std::string::ToString;
 
 const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
 fn check_file(file_path: &str) -> bool {
-    if let Ok(file) = File::open(file_path) {
+    if let Ok(_file) = File::open(file_path) {
         true
     } else {
         false
@@ -42,8 +41,8 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
 }
 
 fn get_file_name(file_path: &String) -> String {
-    let mut file_name = String::new();
     let mut reverse_file_name = String::new();
+
     let reverse_path = file_path.chars().rev().collect::<String>();
     for c in reverse_path.chars() {
         if c != '/' {
@@ -52,14 +51,14 @@ fn get_file_name(file_path: &String) -> String {
             break;
         }
     }
-    file_name = reverse_file_name.chars().rev().collect::<String>();
+    let file_name = reverse_file_name.chars().rev().collect::<String>();
     file_name
 }
 
 fn move_file(file_path: &String) {
-    if (check_file(file_path)) {
+    if check_file(file_path) {
         let file_vector = dir_to_vec(file_path.to_string());
-        let file = vec_to_file(file_vector, get_file_name(file_path));
+        vec_to_file(file_vector, get_file_name(file_path));
     } else {
         println!("File does not exist");
     }
@@ -71,7 +70,7 @@ fn main() {
     // check_file("/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar");
     // check_file("/Users/aidengage/dev/senior/cate/file-for-upload/whatiasdohe.txt");
 
-    let path = "/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.2.jar".to_string();
+    let path = "/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar".to_string();
     move_file(&path);
 
     // let file_name = get_file_name(&path);
