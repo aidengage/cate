@@ -1,10 +1,19 @@
 use std::fs;
 use std::fs::File;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::Path;
 use std::string::ToString;
 
+use std::thread;
+use std::str;
+use std::net::{Ipv4Addr, SocketAddrV4};
+use std::net::{TcpListener, TcpStream, Shutdown};
+
 const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
+const ADDR: Ipv4Addr = Ipv4Addr::LOCALHOST;
+const PORT: u16 = 8000;
+const EXTRA_BYTES: u32 = 15;
+
 
 // static EXCLUDED_CHARS: Vec<char> = Vec::
     // ['/', '\', '(', ')', '<', '>', ':', '"', '|', '*', '?'];
@@ -16,18 +25,6 @@ fn check_file(file_path: &str) -> bool {
         false
     }
 }
-
-// fn check_file(file_path: &str) {
-//     let file_path_result = Path::new(file_path).try_exists();
-//     let checked_path = match file_path_result {
-//         Ok(path) => path,
-//         Err(error) => panic!("{}: file does not exist", error),
-//     };
-// }
-
-// fn verify_name(file_name: &str) -> bool {
-//
-// }
 
 fn dir_to_vec(file_path: String) -> Vec<u8> {
     let clean_path: String = file_path.clone().trim().to_string();
@@ -43,7 +40,10 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
         return;
     } else {
-        let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
+        // println!("{}", file_name); // broken
+        // println!("{}", UPLOAD_DIR);
+        // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
+        let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
         file.write_all(&vec).unwrap();
     }
 }
@@ -72,20 +72,92 @@ fn move_file(file_path: &String) {
     }
 }
 
+// fn ret_val(file: Vec<u8>) -> Vec<u8> {
+//     file
+// }
+
+fn receive_file(/*mut file: &Vec<u8>*/) {
+    let listener = TcpListener::bind(SocketAddrV4::new(ADDR, PORT)).unwrap();
+    println!("{:?}", listener);
+    // file = &Vec::new();
+    for stream in listener.incoming() {
+        match stream {
+            Ok(mut stream) => {
+                println!("New connection: {}", stream.peer_addr().unwrap());
+                thread::spawn(move || handle_client(stream));
+            }
+            Err(error) => {
+                println!("failed to accept connection: {}", error);
+            }
+        }
+    }
+}
+
+fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
+    let mut length_buffer = [0; 4];
+
+    // let mut buffer = [0; 512];
+    let mut received_bytes: Vec<u8> = Vec::new();
+    loop {
+        if let Err(error) = stream.read(&mut length_buffer) {
+            println!("failed to read length: {}", error);
+            break;
+        }
+        let length = u32::from_be_bytes(length_buffer);
+        println!("expecting {} bytes from the client: ", length + EXTRA_BYTES);
+
+        let mut buffer = vec![0; (length + 32) as usize];
+        // let mut buffer = vec![0; 1579379054 as usize];
+
+        match stream.read(&mut buffer) {
+            Ok(size) if size > 0 => {
+                let received = str::from_utf8(&buffer[..size]).unwrap_or("");
+                received_bytes = buffer[..size].to_vec();
+                stream.write(&buffer[..size]).unwrap();
+
+                // println!("file received");
+                // println!("received: {}", received);
+
+                // let received_vec: Vec<u8> = received.trim().as_bytes().to_vec();
+
+                if received.trim() == "#END#" {
+                    println!("Exiting client");
+                    stream.shutdown(Shutdown::Both).unwrap();
+
+                    // break Vec::new();
+                    break;
+                }
+
+                vec_to_file(received_bytes, UPLOAD_DIR.to_string());
+                break;
+                // return received
+                // file = &received_vec;
+                // return received_vec;
+            }
+            Ok(_) => {
+                println!("connection closed by client");
+                // break Vec::new();
+                break;
+            }
+            Err(error) => {
+                println!("failed to read from client: {}", error);
+                // break Vec::new();
+                break;
+            }
+        }
+    }
+}
+
 fn main() {
     // println!("{}", check_file("/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar"));
     // println!("{}", check_file("/Users/aidengage/dev/senior/cate/file-for-upload/whatiasdohe.txt"));
     // check_file("/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar");
     // check_file("/Users/aidengage/dev/senior/cate/file-for-upload/whatiasdohe.txt");
 
-    let path = "/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar".to_string();
-    move_file(&path);
+    // let path = "/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar".to_string();
+    // move_file(&path);
 
-    // let file_name = get_file_name(&path);
-    // println!("File name: {}", file_name);
-    // let file_data = dir_to_vec(path);
-    // vec_to_file(file_data, file_name);
-
-    // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-    // file.write_all(&file_data).unwrap();
+    // let mut file: Vec<u8>;
+    // receive_file(&file);
+    receive_file();
 }
