@@ -5,6 +5,10 @@ use std::path::Path;
 use std::string::ToString;
 
 const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
+
+// static EXCLUDED_CHARS: Vec<char> = Vec::
+    // ['/', '\', '(', ')', '<', '>', ':', '"', '|', '*', '?'];
+
 fn check_file(file_path: &str) -> bool {
     if let Ok(_file) = File::open(file_path) {
         true
@@ -19,6 +23,10 @@ fn check_file(file_path: &str) -> bool {
 //         Ok(path) => path,
 //         Err(error) => panic!("{}: file does not exist", error),
 //     };
+// }
+
+// fn verify_name(file_name: &str) -> bool {
+//
 // }
 
 fn dir_to_vec(file_path: String) -> Vec<u8> {
