@@ -100,53 +100,62 @@ fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
     let mut received_bytes: Vec<u8> = Vec::new();
     loop {
         if let Err(error) = stream.read(&mut length_buffer) {
+        // if let Err(error) = stream.read_exact(&mut received_bytes) {
             println!("failed to read length: {}", error);
             break;
         }
         let length = u32::from_be_bytes(length_buffer);
-        println!("expecting {} bytes from the client: ", length + EXTRA_BYTES);
+        println!("expecting {} bytes from the client: ", length /* + EXTRA_BYTES */);
 
-        let mut buffer = vec![0; (length + 32) as usize];
-        // let mut buffer = vec![0; 1579379054 as usize];
+        let mut buffer = vec![0; length as usize];
 
-        match stream.read(&mut buffer) {
-            Ok(size) if size > 0 => {
-                let received = str::from_utf8(&buffer[..size]).unwrap_or("");
-                received_bytes = buffer[..size].to_vec();
-                stream.write(&buffer[..size]).unwrap();
+        // let mut bytes_received = 0u32;
+        let mut num_bytes_read = 0;
+        break;
+        /*
+        while num_bytes_read != length {
 
-                // println!("file received");
-                // println!("received: {}", received);
+            match stream.read(&mut buffer) {
+                Ok(size) if size > 0 => {
+                    let received = str::from_utf8(&buffer[..size]).unwrap_or("");
+                    received_bytes = buffer[..size].to_vec();
+                    stream.write(&buffer[..size]).unwrap();
+                    num_bytes_read = received_bytes.len() as u32;
 
-                // let received_vec: Vec<u8> = received.trim().as_bytes().to_vec();
+                    // println!("file received");
+                    // println!("received: {}", received);
 
-                if received.trim() == "#END#" {
-                    println!("Exiting client");
-                    stream.shutdown(Shutdown::Both).unwrap();
+                    // let received_vec: Vec<u8> = received.trim().as_bytes().to_vec();
 
+                    if received.trim() == "#END#" {
+                        println!("Exiting client");
+                        stream.shutdown(Shutdown::Both).unwrap();
+
+                        // break Vec::new();
+                        break;
+                    }
+
+                    vec_to_file(received_bytes, UPLOAD_DIR.to_string());
+                    break;
+                    // return received
+                    // file = &received_vec;
+                    // return received_vec;
+                }
+                Ok(_) => {
+                    println!("connection closed by client");
                     // break Vec::new();
                     break;
                 }
-
-                vec_to_file(received_bytes, UPLOAD_DIR.to_string());
-                break;
-                // return received
-                // file = &received_vec;
-                // return received_vec;
+                Err(error) => {
+                    println!("failed to read from client: {}", error);
+                    // break Vec::new();
+                    break;
+                }
             }
-            Ok(_) => {
-                println!("connection closed by client");
-                // break Vec::new();
-                break;
-            }
-            Err(error) => {
-                println!("failed to read from client: {}", error);
-                // break Vec::new();
-                break;
-            }
-        }
+        }*/
     }
 }
+
 
 fn main() {
     // println!("{}", check_file("/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar"));
