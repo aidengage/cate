@@ -15,7 +15,6 @@ const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
 const ADDR: Ipv4Addr = Ipv4Addr::LOCALHOST;
 // const ADDR: Ipv4Addr = Ipv4Addr::new(192, 168, 1, 104);
 const PORT: u16 = 8000;
-// const EXTRA_BYTES: u32 = 15;
 
 
 fn check_file(file_path: &str) -> bool {
@@ -73,9 +72,6 @@ fn move_file(file_path: &String) {
     }
 }
 
-// fn ret_val(file: Vec<u8>) -> Vec<u8> {
-//     file
-// }
 
 fn receive_file(/*mut file: &Vec<u8>*/) {
     let listener = TcpListener::bind(SocketAddrV4::new(ADDR, PORT)).unwrap();
@@ -101,65 +97,43 @@ fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
     let mut received_bytes: Vec<u8> = Vec::new();
     loop {
         if let Err(error) = stream.read(&mut length_buffer) {
-            // if let Err(error) = stream.read_exact(&mut length_buffer) {
             println!("failed to read length: {}", error);
             break;
         }
 
-        // let length = u32::from_be_bytes(length_buffer1);
-
         let length: Vec<u8> = length_buffer.to_vec();
         println!("length: {:?}", length);
-        // println!("expecting {} bytes from the client: ", length /* + EXTRA_BYTES */);
-
-        // let mut buffer = vec![0; length[0] as usize];
-
-        // let mut bytes_received = 0u32;
         let mut num_bytes_read = 0;
         println!("num bytes read: {}", num_bytes_read);
-        // break;
 
-        // while num_bytes_read != length {
 
-            match stream.read(&mut buffer) {
-                Ok(size) if size > 0 => {
-                    let received = str::from_utf8(&buffer[..size]).unwrap_or("");
-                    received_bytes = buffer[..size].to_vec();
-                    stream.write(&buffer[..size]).unwrap();
-                    num_bytes_read = received_bytes.len() as u32;
+        match stream.read(&mut buffer) {
+            Ok(size) if size > 0 => {
+                let received = str::from_utf8(&buffer[..size]).unwrap_or("");
+                received_bytes = buffer[..size].to_vec();
+                stream.write(&buffer[..size]).unwrap();
+                num_bytes_read = received_bytes.len() as u32;
 
-                    // println!("file received");
-                    // println!("received: {}", received);
+                if received.trim() == "#END#" {
+                    println!("Exiting client");
+                    stream.shutdown(Shutdown::Both).unwrap();
 
-                    // let received_vec: Vec<u8> = received.trim().as_bytes().to_vec();
-
-                    if received.trim() == "#END#" {
-                        println!("Exiting client");
-                        stream.shutdown(Shutdown::Both).unwrap();
-
-                        // break Vec::new();
-                        break;
-                    }
-
-                    println!("vector to a file");
-                    vec_to_file(received_bytes, UPLOAD_DIR.to_string());
-                    break;
-                    // return received
-                    // file = &received_vec;
-                    // return received_vec;
-                }
-                Ok(_) => {
-                    println!("connection closed by client");
-                    // break Vec::new();
                     break;
                 }
-                Err(error) => {
-                    println!("failed to read from client: {}", error);
-                    // break Vec::new();
-                    break;
-                }
+
+                println!("vector to a file");
+                vec_to_file(received_bytes, UPLOAD_DIR.to_string());
+                break;
             }
-        // }
+            Ok(_) => {
+                println!("connection closed by client");
+                break;
+            }
+            Err(error) => {
+                println!("failed to read from client: {}", error);
+                break;
+            }
+        }
     }
 }
 
