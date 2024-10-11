@@ -1,39 +1,9 @@
-mod receiver;
-
-use std::fs;
 use std::fs::File;
-use std::io::{Read, Write};
-use std::path::Path;
-use std::string::ToString;
+use std::net::{Shutdown, SocketAddrV4, TcpListener, TcpStream};
 use std::thread;
-use std::str;
-use std::net::{Ipv4Addr, SocketAddrV4};
-use std::net::{TcpListener, TcpStream, Shutdown};
+use std::io::{Read, Write};
 
-const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
-// const UPLOAD_DIR: &str = "/home/cate/rust-socket/upload/";
-const ADDR: Ipv4Addr = Ipv4Addr::LOCALHOST;
-// const ADDR: Ipv4Addr = Ipv4Addr::new(192, 168, 1, 104);
-const PORT: u16 = 8000;
-
-/*
-fn check_file(file_path: &str) -> bool {
-    if let Ok(_file) = File::open(file_path) {
-        true
-    } else {
-        false
-    }
-}
-
-fn dir_to_vec(file_path: String) -> Vec<u8> {
-    let clean_path: String = file_path.clone().trim().to_string();
-    if Path::new(clean_path.as_str()).exists() {
-        let file_contents: Vec<u8> = fs::read(clean_path).unwrap();
-        file_contents
-    } else {
-        Vec::new()
-    }
-}
+use crate::{ADDR, PORT, UPLOAD_DIR};
 
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
@@ -47,32 +17,7 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
     }
 }
 
-fn get_file_name(file_path: &String) -> String {
-    let mut reverse_file_name = String::new();
-
-    let reverse_path = file_path.chars().rev().collect::<String>();
-    for c in reverse_path.chars() {
-        if c != '/' {
-            reverse_file_name.push(c);
-        } else {
-            break;
-        }
-    }
-    let file_name = reverse_file_name.chars().rev().collect::<String>();
-    file_name
-}
-
-fn move_file(file_path: &String) {
-    if check_file(file_path) {
-        let file_vector = dir_to_vec(file_path.to_string());
-        vec_to_file(file_vector, get_file_name(file_path));
-    } else {
-        println!("File does not exist");
-    }
-}
-
-
-fn receive_file(/*mut file: &Vec<u8>*/) {
+pub fn receive_file(/*mut file: &Vec<u8>*/) {
     let listener = TcpListener::bind(SocketAddrV4::new(ADDR, PORT)).unwrap();
     println!("{:?}", listener);
     // file = &Vec::new();
@@ -91,17 +36,17 @@ fn receive_file(/*mut file: &Vec<u8>*/) {
 
 
 
-fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
+pub fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
     let mut length_buffer = vec![0; 8];
-    const file_size: u64 = 0;
+    // const file_size: u64 = 0;
     loop {
         if let Err(error) = stream.read_exact(&mut length_buffer) {
             println!("failed to read length: {}", error);
             break;
         }
         let length: Vec<u8> = length_buffer.to_vec();
-        // let file_size: u64 = u64::from_be_bytes(length_buffer.try_into().unwrap());
-        file_size = u64::from_be_bytes(length_buffer.try_into().unwrap());
+        let file_size: u64 = u64::from_be_bytes(length_buffer.try_into().unwrap());
+        // file_size = u64::from_be_bytes(length_buffer.try_into().unwrap());
         println!("file size: {}", file_size);
         println!("length: {:?}", length);
         break;
@@ -118,7 +63,7 @@ fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
         // }
     }
 
-    let mut buffer = [0; file_size];
+    let mut buffer = [0; 1024];
     let mut received_bytes: Vec<u8> = Vec::new();
     loop {
         // if let Err(error) = stream.read(&mut length_buffer) {
@@ -135,7 +80,7 @@ fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
         match stream.read(&mut buffer) {
             // size is actually the size of the file no fucking way
             Ok(size) if size > 0 => {
-                let received = str::from_utf8(&buffer[..size]).unwrap_or("");
+                let received = std::str::from_utf8(&buffer[..size]).unwrap_or("");
                 received_bytes = buffer[..size].to_vec();
                 stream.write(&buffer[..size]).unwrap();
                 num_bytes_read = received_bytes.len() as u32;
@@ -162,20 +107,4 @@ fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
             }
         }
     }
-}
-
-*/
-fn main() {
-
-    // println!("{}", check_file("/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar"));
-    // println!("{}", check_file("/Users/aidengage/dev/senior/cate/file-for-upload/whatiasdohe.txt"));
-    // check_file("/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar");
-    // check_file("/Users/aidengage/dev/senior/cate/file-for-upload/whatiasdohe.txt");
-
-    // let path = "/Users/aidengage/dev/senior/cate/file-for-upload/fabric-api-0.103.0+1.21.1.jar".to_string();
-    // move_file(&path);
-
-    // let mut file: Vec<u8>;
-    // receive_file(&file);
-    receiver::receive_file();
 }
