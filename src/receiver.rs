@@ -10,9 +10,10 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
         return;
     } else {
         // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
+        // let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "temp.txt").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "newcpp.txt").unwrap();
+        let mut file = File::create(UPLOAD_DIR.to_string() + "fabric-api.jar").unwrap();
         file.write_all(&vec).unwrap();
     }
 }
@@ -79,9 +80,9 @@ pub fn handle_client(mut stream: TcpStream, /* size: u64 */ ) {
         // Process the chunk of data (for demonstration, we append to the data vector)
         buffer.extend_from_slice(&temp_buffer[..bytes_read]);
 
-        println!("Received {} bytes", bytes_read);
+        // println!("Received {} bytes", bytes_read);
         // Optionally, you can print the data chunk received (e.g., if it's text)
-        println!("Chunk: {}", String::from_utf8_lossy(&buffer[..bytes_read]));
+        // println!("Chunk: {}", String::from_utf8_lossy(&buffer[..bytes_read]));
     }
 
     println!("buffer size {}", buffer.len());
