@@ -3,20 +3,20 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
 use std::string::ToString;
-
 use std::thread;
 use std::str;
 use std::net::{Ipv4Addr, SocketAddrV4};
 use std::net::{TcpListener, TcpStream, Shutdown};
 
+// local directory
 const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
+// server directory
+// const UPLOAD_DIR: &str = "/home/cate/rust-socket/upload/";
 const ADDR: Ipv4Addr = Ipv4Addr::LOCALHOST;
+// const ADDR: Ipv4Addr = Ipv4Addr::new(192, 168, 1, 104);
 const PORT: u16 = 8000;
-const EXTRA_BYTES: u32 = 15;
+// const EXTRA_BYTES: u32 = 15;
 
-
-// static EXCLUDED_CHARS: Vec<char> = Vec::
-    // ['/', '\', '(', ')', '<', '>', ':', '"', '|', '*', '?'];
 
 fn check_file(file_path: &str) -> bool {
     if let Ok(_file) = File::open(file_path) {
@@ -43,7 +43,8 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
         // println!("{}", file_name); // broken
         // println!("{}", UPLOAD_DIR);
         // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
+        // let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
+        let mut file = File::create(UPLOAD_DIR.to_string() + "temp.txt").unwrap();
         file.write_all(&vec).unwrap();
     }
 }
@@ -94,26 +95,31 @@ fn receive_file(/*mut file: &Vec<u8>*/) {
 }
 
 fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
-    let mut length_buffer = [0; 4];
+    let mut length_buffer = vec![0; 1];
 
-    // let mut buffer = [0; 512];
+    let mut buffer = [0; 1024 * 3];
     let mut received_bytes: Vec<u8> = Vec::new();
     loop {
         if let Err(error) = stream.read(&mut length_buffer) {
-        // if let Err(error) = stream.read_exact(&mut received_bytes) {
+            // if let Err(error) = stream.read_exact(&mut length_buffer) {
             println!("failed to read length: {}", error);
             break;
         }
-        let length = u32::from_be_bytes(length_buffer);
-        println!("expecting {} bytes from the client: ", length /* + EXTRA_BYTES */);
 
-        let mut buffer = vec![0; length as usize];
+        // let length = u32::from_be_bytes(length_buffer1);
+
+        let length: Vec<u8> = length_buffer.to_vec();
+        println!("length: {:?}", length);
+        // println!("expecting {} bytes from the client: ", length /* + EXTRA_BYTES */);
+
+        // let mut buffer = vec![0; length[0] as usize];
 
         // let mut bytes_received = 0u32;
         let mut num_bytes_read = 0;
-        break;
-        /*
-        while num_bytes_read != length {
+        println!("num bytes read: {}", num_bytes_read);
+        // break;
+
+        // while num_bytes_read != length {
 
             match stream.read(&mut buffer) {
                 Ok(size) if size > 0 => {
@@ -135,6 +141,7 @@ fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
                         break;
                     }
 
+                    println!("vector to a file");
                     vec_to_file(received_bytes, UPLOAD_DIR.to_string());
                     break;
                     // return received
@@ -152,7 +159,7 @@ fn handle_client(mut stream: TcpStream, /*mut file: &Vec<u8>*/) {
                     break;
                 }
             }
-        }*/
+        // }
     }
 }
 
