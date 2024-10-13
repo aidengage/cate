@@ -10,10 +10,11 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
         return;
     } else {
         // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        // let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
+        let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "temp.txt").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "newcpp.txt").unwrap();
-        let mut file = File::create(UPLOAD_DIR.to_string() + "fabric-api.jar").unwrap();
+        // let mut file = File::create(UPLOAD_DIR.to_string() + "fabric-api.jar").unwrap();
+        // let mut file = File::create(UPLOAD_DIR.to_string() + "fire.zip").unwrap();
         file.write_all(&vec).unwrap();
     }
 }
@@ -67,13 +68,15 @@ pub fn handle_client(mut stream: TcpStream, /* size: u64 */ ) {
 
     let mut bytes_read = 0;
 
+    println!("received:");
     loop {
         // Read from the stream into the buffer
         let bytes_read = stream.read(&mut temp_buffer).unwrap();
+        print!("|");
 
         if bytes_read == 0 {
             // Connection closed or end of stream
-            println!("Client disconnected.");
+            println!("\nClient disconnected.");
             break;
         }
 
