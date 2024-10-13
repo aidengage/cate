@@ -10,7 +10,8 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
         return;
     } else {
         // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
+        // let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
+        let mut file = File::create(UPLOAD_DIR.to_string() + "cate2.zip").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "temp.txt").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "newcpp.txt").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "fabric-api.jar").unwrap();
@@ -90,63 +91,4 @@ pub fn handle_client(mut stream: TcpStream, /* size: u64 */ ) {
 
     println!("buffer size {}", buffer.len());
     vec_to_file(buffer, UPLOAD_DIR.to_string());
-
-    /*
-
-    loop {
-        // if let Err(error) = stream.read(&mut length_buffer) {
-        //     println!("failed to read length: {}", error);
-        //     break;
-        // }
-
-        // let length: Vec<u8> = length_buffer.to_vec();
-        // println!("length: {:?}", length);
-        // println!("num bytes read: {}", num_bytes_read);
-
-        // let bytes_read = stream.read(&mut temp_buffer).unwrap();
-        // if bytes_read == 0 {
-        //     break;
-        // }
-        // buffer.extend_from_slice(&temp_buffer[0..bytes_read]);
-
-        match stream.read(&mut temp_buffer) {
-            // size is actually the size of the file no fucking way
-            Ok(size) if size > bytes_read => {
-
-                let received = std::str::from_utf8(&temp_buffer[..size]).unwrap_or("");
-                // println!("received: {}", received);
-                received_bytes = temp_buffer[..size].to_vec();
-                stream.write(&temp_buffer[..size]).unwrap();
-                bytes_read += received_bytes.len();
-                // println!("bytes read: {}", bytes_read);
-                // bytes_read = received_bytes.len() as u32;
-                // println!("size: {:?}", size);
-                // println!("temp_buffer size: {}", temp_buffer.len());
-                buffer.extend_from_slice(&temp_buffer[..size]);
-                // println!("buffer size: {}", buffer.len());
-
-                if received.trim() == "#END#" {
-                    println!("Exiting client");
-                    stream.shutdown(Shutdown::Both).unwrap();
-
-                    break;
-                }
-
-                println!("vector to a file");
-                // vec_to_file(received_bytes, UPLOAD_DIR.to_string());
-                vec_to_file(buffer, UPLOAD_DIR.to_string());
-                break;
-            }
-            Ok(_) => {
-                println!("connection closed by client");
-                break;
-            }
-            Err(error) => {
-                println!("failed to read from client: {}", error);
-                break;
-            }
-        }
-    }
-
-     */
 }
