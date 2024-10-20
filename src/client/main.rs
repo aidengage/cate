@@ -34,7 +34,6 @@ fn dir_to_vec(file_path: String) -> Vec<u8> {
     }
 }
 
-// hmmmmm
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
         return;
@@ -80,16 +79,7 @@ fn move_file(file_path: &String) {
     }
 }
 
-// old shit
-
-
-fn main() -> std::io::Result<()> {
-    // let file_path = "/Users/aidengage/dev/senior/cate/upload/fabric-api-0.103.0+1.21.1.jar";
-    // let file_path = "/Users/aidengage/dev/senior/cate/upload/Fire.zip";
-    // let file_path = "/Users/aidengage/dev/senior/cate/upload/newMain.cpp";
-    // let file_path = "/Users/aidengage/dev/senior/cate/upload/cate-checkpoint2.zip";
-    // let file_path = "/Users/aidengage/dev/senior/cate/upload/temp.txt";
-
+fn send_file() -> std::io::Result<()> {
     println!("Hello Client!");
 
     // let paths = fs::read_dir("/Users/aidengage/dev/senior/cate/file-for-upload/")?;
@@ -147,4 +137,8 @@ fn main() -> std::io::Result<()> {
     }
 
     Ok(())
+}
+
+fn main() {
+    send_file().unwrap();
 }

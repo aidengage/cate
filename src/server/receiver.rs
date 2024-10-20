@@ -9,14 +9,7 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
         return;
     } else {
-        // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        // let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
-        // let mut file = File::create(UPLOAD_DIR.to_string() + "cate2.zip").unwrap();
         let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        // let mut file = File::create(UPLOAD_DIR.to_string() + "temp.txt").unwrap();
-        // let mut file = File::create(UPLOAD_DIR.to_string() + "newcpp.txt").unwrap();
-        // let mut file = File::create(UPLOAD_DIR.to_string() + "fabric-api.jar").unwrap();
-        // let mut file = File::create(UPLOAD_DIR.to_string() + "fire.zip").unwrap();
         file.write_all(&vec).unwrap();
     }
 }
@@ -38,7 +31,7 @@ pub fn receive_file(/*mut file: &Vec<u8>*/) {
     }
 }
 
-pub fn handle_client(mut stream: TcpStream, /* size: u64 */ ) {
+pub fn handle_client(mut stream: TcpStream) {
 
     let mut name_length_buffer = [0u8; 8];
     stream.read_exact(&mut name_length_buffer).unwrap();
