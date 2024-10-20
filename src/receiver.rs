@@ -12,7 +12,7 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
         // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "file.cpp").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "cate2.zip").unwrap();
-        let mut file = File::create(UPLOAD_DIR.to_string() + &file_name).unwrap();
+        let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "temp.txt").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "newcpp.txt").unwrap();
         // let mut file = File::create(UPLOAD_DIR.to_string() + "fabric-api.jar").unwrap();
