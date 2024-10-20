@@ -9,6 +9,7 @@ use std::path::Path;
 
 const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
 const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/upload/";
+const DISCARD: &str = "/Users/aidengage/dev/senior/cate/discard/";
 const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(192,168,1,104);
@@ -48,9 +49,14 @@ fn vec_to_discard(vec: Vec<u8>, file_name: String) {
         return;
     } else {
         // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        let mut file = File::create("/Users/aidengage/dev/senior/cate/discard/".to_string() + file_name.as_str()).unwrap();
+        // let mut file = File::create("/Users/aidengage/dev/senior/cate/discard/".to_string() + file_name.as_str()).unwrap();
+        let mut file = File::create(DISCARD.to_string() + file_name.as_str()).unwrap();
         file.write_all(&vec).unwrap();
     }
+}
+
+fn remove_file(file_path: String) {
+    fs::remove_file(file_path).unwrap();
 }
 
 fn get_file_name(file_path: &String) -> String {
@@ -69,8 +75,8 @@ fn get_file_name(file_path: &String) -> String {
 }
 
 // hmmmmm
-fn move_file(file_path: &String) {
-    if check_file(file_path) {
+fn move_file(file_path: String) {
+    if check_file(&file_path) {
         let file_vector = dir_to_vec(file_path.to_string());
         // vec_to_file(file_vector, get_file_name(file_path));
         vec_to_discard(file_vector, file_path.to_string());
@@ -89,51 +95,58 @@ fn send_file() -> std::io::Result<()> {
     for path in paths {
         directory = path?.path().display().to_string();
         file_name = get_file_name(&directory);
-        println!("Path: {}", directory);
-    }
-    let name_of_file = file_name.clone();
-    if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
-        println!("Connected to the server on {:?}", stream.peer_addr()?);
+        if file_name.as_bytes()[0] as char != '.' {
+            println!("Path: {}", directory);
 
-        let full_path = PULL_DIR.to_string() + name_of_file.as_str();
-        let name_vec = file_name.into_bytes();
-        let name_len = name_vec.len().to_be_bytes().to_vec();
+            // }
+            let name_of_file = file_name.clone();
+            if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
+                println!("Connected to the server on {:?}", stream.peer_addr()?);
 
-        stream.write(&name_len)?;
-        println!("name vec: {:?}", name_vec);
-        stream.write_all(&name_vec)?;
+                let full_path = PULL_DIR.to_string() + name_of_file.as_str();
+                let name_vec = file_name.into_bytes();
+                let name_len = name_vec.len().to_be_bytes().to_vec();
 
-        let mut file_size = 0;
-        match metadata(&full_path) {
-            Ok(metadata) => {
-                file_size = metadata.len();
-                println!("File size: {}", file_size);
-            }
-            Err(error) => {
-                println!("Error: {}", error);
+                stream.write(&name_len)?;
+                println!("name vec: {:?}", name_vec);
+                stream.write_all(&name_vec)?;
+
+                let mut file_size = 0;
+                match metadata(&full_path) {
+                    Ok(metadata) => {
+                        file_size = metadata.len();
+                        println!("File size: {}", file_size);
+                    }
+                    Err(error) => {
+                        println!("Error: {}", error);
+                    }
+                }
+
+                let message = dir_to_vec(full_path.clone());
+
+                let length = vec![message.len() as u8];
+                let size_array = file_size.to_be_bytes().to_vec();
+
+                println!("size array: {:?}", size_array);
+
+                stream.write(&size_array)?;
+
+                match message[..] {
+
+                    // "#END#" => stream.shutdown(Shutdown::Both).expect("Shutdown Failed!"),
+                    [] => stream.shutdown(Shutdown::Both).expect("shutdown call failed"),
+                    _ => {
+                        println!("SENT!");
+                        stream.write(&message)?;
+                        vec_to_discard(message, name_of_file.clone());
+                        remove_file(full_path.to_string());
+                        // move_file(DISCARD.to_string() + file_name.as_str());
+                    }
+                }
+            } else {
+                println!("Couldn't connect to server...");
             }
         }
-
-        let message = dir_to_vec(full_path);
-
-        let length = vec![message.len() as u8];
-        let size_array = file_size.to_be_bytes().to_vec();
-
-        println!("size array: {:?}", size_array);
-
-        stream.write(&size_array)?;
-
-        match message[..] {
-
-            // "#END#" => stream.shutdown(Shutdown::Both).expect("Shutdown Failed!"),
-            [] => stream.shutdown(Shutdown::Both).expect("shutdown call failed"),
-            _ => {
-                println!("SENT!");
-                stream.write(&message)?;
-            }
-        }
-    } else {
-        println!("Couldn't connect to server...");
     }
 
     Ok(())
