@@ -1,12 +1,10 @@
 //slint
 // #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use slint;
+
 use std::error::Error;
 
 slint::include_modules!();
-
-
-
 use std::fs;
 use std::fs::File;
 use std::fs::metadata;
@@ -106,7 +104,7 @@ fn send_file() -> std::io::Result<()> {
         file_name = get_file_name(&directory);
         // file_name = get_file_name(&path?.path().display().to_string());
         if file_name.as_bytes()[0] as char != '.' {
-            println!("Path: {}", directory);
+            // println!("Path: {}", directory);
 
             // }
             let name_of_file = file_name.clone();
@@ -118,7 +116,7 @@ fn send_file() -> std::io::Result<()> {
                 let name_len = name_vec.len().to_be_bytes().to_vec();
 
                 stream.write(&name_len)?;
-                println!("name vec: {:?}", name_vec);
+                // println!("name vec: {:?}", name_vec);
                 stream.write_all(&name_vec)?;
 
                 let mut file_size = 0;
@@ -137,7 +135,7 @@ fn send_file() -> std::io::Result<()> {
                 let length = vec![message.len() as u8];
                 let size_array = file_size.to_be_bytes().to_vec();
 
-                println!("size array: {:?}", size_array);
+                // println!("size array: {:?}", size_array);
 
                 stream.write(&size_array)?;
 
@@ -169,7 +167,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         let ui_handle = ui.as_weak();
         move || {
             let ui = ui_handle.unwrap();
-            ui.set_counter(ui.get_counter() + 1);
+            // ui.set_counter(ui.get_counter() + 1);
+            send_file().unwrap();
         }
     });
 
