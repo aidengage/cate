@@ -1,3 +1,12 @@
+//slint
+// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use slint;
+use std::error::Error;
+
+slint::include_modules!();
+
+
+
 use std::fs;
 use std::fs::File;
 use std::fs::metadata;
@@ -95,6 +104,7 @@ fn send_file() -> std::io::Result<()> {
     for path in paths {
         directory = path?.path().display().to_string();
         file_name = get_file_name(&directory);
+        // file_name = get_file_name(&path?.path().display().to_string());
         if file_name.as_bytes()[0] as char != '.' {
             println!("Path: {}", directory);
 
@@ -152,6 +162,23 @@ fn send_file() -> std::io::Result<()> {
     Ok(())
 }
 
-fn main() {
-    send_file().unwrap();
+fn main() -> Result<(), Box<dyn Error>> {
+    let ui = AppWindow::new()?;
+
+    ui.on_request_increase_value({
+        let ui_handle = ui.as_weak();
+        move || {
+            let ui = ui_handle.unwrap();
+            ui.set_counter(ui.get_counter() + 1);
+        }
+    });
+
+    ui.run()?;
+
+    Ok(())
 }
+
+
+// fn main() {
+//     send_file().unwrap();
+// }
