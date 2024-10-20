@@ -17,8 +17,8 @@ use std::path::Path;
 const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
 const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/upload/";
 const DISCARD: &str = "/Users/aidengage/dev/senior/cate/discard/";
-const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
-// const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
+// const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
+const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(192,168,1,104);
 const PORT: u16 = 8000;
 
@@ -160,22 +160,66 @@ fn send_file() -> std::io::Result<()> {
     Ok(())
 }
 
+use slint::WindowSize;
+use slint::PhysicalSize;
+use slint::LogicalSize;
+use slint::Weak;
+
+// pub struct LogicalSize {
+//     pub width: f32,
+//     pub height: f32,
+// }
+//
+// pub struct PhysicalSize {
+//     pub width: u32,
+//     pub height: u32,
+// }
+
 fn main() -> Result<(), Box<dyn Error>> {
     let ui = AppWindow::new()?;
+    // let window = ui.window();
+    // window.set_title("Cate");
+    // let app: App = App::new().unwrap();
+    // let weak: Weak<App> = app.as_weak();
+    // let size: PhysicalSize = PhysicalSize::new(1920, 1080);
+    // let logical_size = LogicalSize::new(800, 600);
 
+    // ui.window().set_size(PhysicalSize::new(1280, 720));
+    // app.window().set_size(PhysicalSize::new(1280, 720));
+    println!("window size: {:?}", ui.window().size());
     ui.on_request_increase_value({
         let ui_handle = ui.as_weak();
         move || {
             let ui = ui_handle.unwrap();
-            // ui.set_counter(ui.get_counter() + 1);
             send_file().unwrap();
         }
     });
 
     ui.run()?;
+    // app.run()?;
 
     Ok(())
 }
+
+
+// slint::slint! {
+//     import {Button, VerticalBox, HorizontalBox} from "std-widgets.slint";
+//     export component App inherits Window {
+//         width: 1280px;
+//         height: 720px;
+//
+//         in property <bool> data_exists;
+//         callback upload_file_clicked <=> upload_btn.clicked;
+//
+//         VerticalBox {
+//             Text {
+//                 text: data_exists ? "Found existing data, loading..." : "Please upload an MBOX or JSON file."; }
+//             HorizontalBox {
+//                 upload_btn := Button { text: "Upload"; }
+//             }
+//         }
+//     }
+// }
 
 
 // fn main() {

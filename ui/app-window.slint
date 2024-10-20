@@ -1,16 +1,35 @@
 import { Button, VerticalBox } from "std-widgets.slint";
 
 export component AppWindow inherits Window {
-    in-out property <int> counter: 42;
+//    in-out property <int> counter: 42;
     callback request-increase-value();
-    VerticalBox {
-        Text {
-            text: "Counter: \{root.counter}";
-        }
+    callback request-send-file();
 
+    title: "Cate";
+
+    height: 360px;
+    width: 640px;
+
+//    min-height: 360px;
+//    min-width: 640px;
+
+//    max-height: 1080px;
+//    max-width: 1920px;
+    
+    preferred-height: 100%;
+    preferred-width: 100%;
+    VerticalBox {
+        HorizontalLayout {
+            Text {
+                text: "cate";
+                font-size: 35px;
+            }
+            alignment: center;
+        }
         Button {
-            text: "Increase value";
+            text: "send file out";
             clicked => {
+//                root.request-send-file();
                 root.request-increase-value();
             }
         }
