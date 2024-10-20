@@ -99,25 +99,19 @@ fn main() -> std::io::Result<()> {
     for path in paths {
         directory = path?.path().display().to_string();
         file_name = get_file_name(&directory);
-        // println!("name: {}", path.unwrap().path().display());
         println!("Path: {}", directory);
-        // println!("Name: {}", file_name);
-        // vec_to_discard(dir_to_vec(&directory), file_name);
-        // fs::remove_file(directory)?;
     }
     let name_of_file = file_name.clone();
     if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
         println!("Connected to the server on {:?}", stream.peer_addr()?);
-        let full_path = PULL_DIR.to_string() + name_of_file.as_str();
 
+        let full_path = PULL_DIR.to_string() + name_of_file.as_str();
         let name_vec = file_name.into_bytes();
         let name_len = name_vec.len().to_be_bytes().to_vec();
+
         stream.write(&name_len)?;
         println!("name vec: {:?}", name_vec);
         stream.write_all(&name_vec)?;
-        // stream.shutdown(Shutdown::Both)?;
-        // }
-        // if let Ok( mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
 
         let mut file_size = 0;
         match metadata(&full_path) {
@@ -130,45 +124,14 @@ fn main() -> std::io::Result<()> {
             }
         }
 
-        // let message = dir_to_vec(PULL_DIR.to_string() + file_name.as_str());
         let message = dir_to_vec(full_path);
-        // let message = dir_to_vec(file_path.to_string());
-        // println!("message length: {}", message.len());
-        // println!("{:?}", message);
-        // let length = message.len();
-        // match metadata(PULL_DIR.to_string() + file_name.as_str()) {
-        // match metadata(full_path.clone()) {
-
-        // match metadata(&full_path) {
-        //     Ok(metadata) => {
-        //         file_size = metadata.len();
-        //         println!("File size: {}", file_size);
-        //     }
-        //     Err(error) => {
-        //         println!("Error: {}", error);
-        //     }
-        // }
 
         let length = vec![message.len() as u8];
-        // let length = vec![file_size];
         let size_array = file_size.to_be_bytes().to_vec();
+
         println!("size array: {:?}", size_array);
-        // println!("length: {:?}", file_size);
-        // stream.write(&length)?;
 
         stream.write(&size_array)?;
-
-        // let name_vec = file_name.into_bytes();
-        // stream.write_all(&name_vec)?;
-        // println!("name_vec: {:?}", name_vec);
-        // println!("name: {}", String::from_utf8_lossy(&name_vec));
-
-        // send length to server
-        // let _ = stream.write(&length);
-        // stream.write(length.to_string().as_bytes())?;
-
-        // println!("Message: {}", message);
-        // match message.as_str() {
 
         match message[..] {
 
@@ -176,21 +139,12 @@ fn main() -> std::io::Result<()> {
             [] => stream.shutdown(Shutdown::Both).expect("shutdown call failed"),
             _ => {
                 println!("SENT!");
-                // let vec = &message.into_bytes();
-                // println!("Message: {}", String::from_utf8_lossy(&vec));
-                // println!("{:?}", vec);
-                // stream.write(&message.into_bytes())?;
-
-                // stream.write(&vec)?;
-
                 stream.write(&message)?;
             }
         }
     } else {
         println!("Couldn't connect to server...");
     }
-    // end of paths for loop
-    // }
 
     Ok(())
 }
