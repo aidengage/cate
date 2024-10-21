@@ -8,13 +8,13 @@ slint::include_modules!();
 use std::fs;
 use std::fs::File;
 use std::fs::metadata;
-use std::io::{Read, Write};
+use std::io::Write;
 use std::net::{Ipv4Addr, SocketAddrV4};
 use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 
-const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
+// const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
 const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/upload/";
 const DISCARD: &str = "/Users/aidengage/dev/senior/cate/discard/";
 // const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
@@ -24,13 +24,13 @@ const PORT: u16 = 8000;
 
 
 
-fn check_file(file_path: &str) -> bool {
-    if let Ok(_file) = File::open(file_path) {
-        true
-    } else {
-        false
-    }
-}
+// fn check_file(file_path: &str) -> bool {
+//     if let Ok(_file) = File::open(file_path) {
+//         true
+//     } else {
+//         false
+//     }
+// }
 
 fn dir_to_vec(file_path: String) -> Vec<u8> {
     let clean_path: String = file_path.clone().trim().to_string();
@@ -42,14 +42,14 @@ fn dir_to_vec(file_path: String) -> Vec<u8> {
     }
 }
 
-fn vec_to_file(vec: Vec<u8>, file_name: String) {
-    if vec.len() == 0 {
-        return;
-    } else {
-        let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        file.write_all(&vec).unwrap();
-    }
-}
+// fn vec_to_file(vec: Vec<u8>, file_name: String) {
+//     if vec.len() == 0 {
+//         return;
+//     } else {
+//         let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
+//         file.write_all(&vec).unwrap();
+//     }
+// }
 
 fn vec_to_discard(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
@@ -82,26 +82,26 @@ fn get_file_name(file_path: &String) -> String {
 }
 
 // hmmmmm
-fn move_file(file_path: String) {
-    if check_file(&file_path) {
-        let file_vector = dir_to_vec(file_path.to_string());
-        // vec_to_file(file_vector, get_file_name(file_path));
-        vec_to_discard(file_vector, file_path.to_string());
-    } else {
-        println!("File does not exist");
-    }
-}
+// fn move_file(file_path: String) {
+//     if check_file(&file_path) {
+//         let file_vector = dir_to_vec(file_path.to_string());
+//         // vec_to_file(file_vector, get_file_name(file_path));
+//         vec_to_discard(file_vector, file_path.to_string());
+//     } else {
+//         println!("File does not exist");
+//     }
+// }
 
 fn send_file() -> std::io::Result<()> {
     println!("Hello Client!");
 
     // let paths = fs::read_dir("/Users/aidengage/dev/senior/cate/file-for-upload/")?;
     let paths = fs::read_dir(PULL_DIR)?;
-    let mut directory = String::new();
-    let mut file_name = String::new();
+    // let mut directory = String::new();
+    // let mut file_name = String::new();
     for path in paths {
-        directory = path?.path().display().to_string();
-        file_name = get_file_name(&directory);
+        let directory = path?.path().display().to_string();
+        let file_name = get_file_name(&directory);
         // file_name = get_file_name(&path?.path().display().to_string());
         if file_name.as_bytes()[0] as char != '.' {
             // println!("Path: {}", directory);
@@ -132,7 +132,7 @@ fn send_file() -> std::io::Result<()> {
 
                 let message = dir_to_vec(full_path.clone());
 
-                let length = vec![message.len() as u8];
+                // let length = vec![message.len() as u8];
                 let size_array = file_size.to_be_bytes().to_vec();
 
                 // println!("size array: {:?}", size_array);
@@ -160,10 +160,10 @@ fn send_file() -> std::io::Result<()> {
     Ok(())
 }
 
-use slint::WindowSize;
-use slint::PhysicalSize;
-use slint::LogicalSize;
-use slint::Weak;
+// use slint::WindowSize;
+// use slint::PhysicalSize;
+// use slint::LogicalSize;
+// use slint::Weak;
 
 // pub struct LogicalSize {
 //     pub width: f32,
@@ -188,9 +188,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     // app.window().set_size(PhysicalSize::new(1280, 720));
     println!("window size: {:?}", ui.window().size());
     ui.on_request_increase_value({
-        let ui_handle = ui.as_weak();
+        // let ui_handle = ui.as_weak();
         move || {
-            let ui = ui_handle.unwrap();
+            // let ui = ui_handle.unwrap();
             send_file().unwrap();
         }
     });

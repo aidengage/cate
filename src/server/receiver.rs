@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::net::{Shutdown, SocketAddrV4, TcpListener, TcpStream};
+use std::net::{SocketAddrV4, TcpListener, TcpStream};
 use std::thread;
 use std::io::{Read, Write};
 
@@ -19,7 +19,7 @@ pub fn receive_file(/*mut file: &Vec<u8>*/) {
     println!("{:?}", listener);
     for stream in listener.incoming() {
         match stream {
-            Ok(mut stream) => {
+            Ok(stream) => {
                 println!("New connection: {}", stream.peer_addr().unwrap());
                 thread::spawn(move || handle_client(stream));
             }
@@ -45,7 +45,7 @@ pub fn handle_client(mut stream: TcpStream) {
     if let Err(error) = stream.read_exact(&mut length_buffer) {
         println!("failed to read length: {}", error);
     }
-    let length: Vec<u8> = length_buffer.to_vec();
+    // let length: Vec<u8> = length_buffer.to_vec();
     let file_size: u64 = u64::from_be_bytes(length_buffer.try_into().unwrap());
     println!("file size in bytes: {}", file_size);
 
