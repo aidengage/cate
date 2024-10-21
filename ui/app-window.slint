@@ -1,20 +1,24 @@
 import { Button, VerticalBox } from "std-widgets.slint";
+import "./../OxygenMono-Regular.ttf";
 
 export component AppWindow inherits Window {
 //    in-out property <int> counter: 42;
     callback request-increase-value();
     callback request-send-file();
 
+    default-font-family: "Oxygen Mono";
+    default-font-size: 20px;
+    background: #73ffde;
     title: "Cate";
 
-    height: 360px;
-    width: 640px;
+//    height: 360px;
+//    width: 640px;
 
-//    min-height: 360px;
-//    min-width: 640px;
+    min-height: 360px;
+    min-width: 640px;
 
-//    max-height: 1080px;
-//    max-width: 1920px;
+    max-height: 720px;
+    max-width: 1280px;
     
     preferred-height: 100%;
     preferred-width: 100%;
@@ -22,16 +26,23 @@ export component AppWindow inherits Window {
         HorizontalLayout {
             Text {
                 text: "cate";
-                font-size: 35px;
+                font-size: 50px;
             }
             alignment: center;
         }
-        Button {
-            text: "send file out";
-            clicked => {
-//                root.request-send-file();
-                root.request-increase-value();
+        HorizontalLayout {
+
+            Button {
+                text: "send file out";
+                clicked => {
+//                    root.request-send-file();
+                    root.request-increase-value();
+                    self.text = "files sent out";
+                }
             }
+//            Text {
+//                font-size: 35px;
+//            }
         }
     }
 }
