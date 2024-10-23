@@ -33,6 +33,8 @@ pub fn receive_file(/*mut file: &Vec<u8>*/) {
 pub fn handle_client(mut stream: TcpStream) {
 
     let mut name_length_buffer = [0u8; 8];
+    // issue when this receives nothing
+    // when client shutdown down connection without sending anything
     stream.read_exact(&mut name_length_buffer).unwrap();
     let name_len = u64::from_be_bytes(name_length_buffer);
 

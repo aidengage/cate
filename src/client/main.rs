@@ -1,10 +1,7 @@
-//slint
-// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use slint;
+slint::include_modules!();
 
 use std::error::Error;
-
-slint::include_modules!();
 use std::fs;
 use std::fs::File;
 use std::fs::metadata;
@@ -15,10 +12,10 @@ use std::net::{TcpStream};
 use std::path::Path;
 
 // const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
-const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/upload/";
-const DISCARD: &str = "/Users/aidengage/dev/senior/cate/discard/";
-// const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
-const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
+const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
+const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
+const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
+// const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(192,168,1,104);
 const PORT: u16 = 8000;
 
@@ -92,6 +89,10 @@ fn get_file_name(file_path: &String) -> String {
 //     }
 // }
 
+fn file_progress() {
+
+}
+
 fn send_file() -> std::io::Result<()> {
     println!("Hello Client!");
 
@@ -112,6 +113,24 @@ fn send_file() -> std::io::Result<()> {
                 println!("Connected to the server on {:?}", stream.peer_addr()?);
 
                 let full_path = PULL_DIR.to_string() + name_of_file.as_str();
+
+                let mut file_size = 0;
+                match metadata(&full_path) {
+                    Ok(metadata) => {
+                        file_size = metadata.len();
+                        if file_size < isize::MAX as u64 {
+                            println!("one of your files is too large (over {})", isize::MAX as u64);
+                            // shutdown causes issue when sending nothing
+                            stream.shutdown(Shutdown::Both).expect("shutdown call failed");
+                            continue;
+                        }
+                        println!("File size: {}", file_size);
+                    }
+                    Err(error) => {
+                        println!("Error: {}", error);
+                    }
+                }
+
                 let name_vec = file_name.into_bytes();
                 let name_len = name_vec.len().to_be_bytes().to_vec();
 
@@ -119,16 +138,7 @@ fn send_file() -> std::io::Result<()> {
                 // println!("name vec: {:?}", name_vec);
                 stream.write_all(&name_vec)?;
 
-                let mut file_size = 0;
-                match metadata(&full_path) {
-                    Ok(metadata) => {
-                        file_size = metadata.len();
-                        println!("File size: {}", file_size);
-                    }
-                    Err(error) => {
-                        println!("Error: {}", error);
-                    }
-                }
+
 
                 let message = dir_to_vec(full_path.clone());
 
@@ -160,68 +170,21 @@ fn send_file() -> std::io::Result<()> {
     Ok(())
 }
 
-// use slint::WindowSize;
-// use slint::PhysicalSize;
-// use slint::LogicalSize;
-// use slint::Weak;
-
-// pub struct LogicalSize {
-//     pub width: f32,
-//     pub height: f32,
-// }
-//
-// pub struct PhysicalSize {
-//     pub width: u32,
-//     pub height: u32,
-// }
-
 fn main() -> Result<(), Box<dyn Error>> {
-    let ui = AppWindow::new()?;
-    // let window = ui.window();
-    // window.set_title("Cate");
-    // let app: App = App::new().unwrap();
-    // let weak: Weak<App> = app.as_weak();
-    // let size: PhysicalSize = PhysicalSize::new(1920, 1080);
-    // let logical_size = LogicalSize::new(800, 600);
 
-    // ui.window().set_size(PhysicalSize::new(1280, 720));
-    // app.window().set_size(PhysicalSize::new(1280, 720));
+    println!("max size: {}", isize::MAX as usize);
+
+    let ui = AppWindow::new()?;
+
     println!("window size: {:?}", ui.window().size());
-    ui.on_request_increase_value({
-        // let ui_handle = ui.as_weak();
+
+    ui.on_request_send_file({
         move || {
-            // let ui = ui_handle.unwrap();
             send_file().unwrap();
         }
     });
 
     ui.run()?;
-    // app.run()?;
 
     Ok(())
 }
-
-
-// slint::slint! {
-//     import {Button, VerticalBox, HorizontalBox} from "std-widgets.slint";
-//     export component App inherits Window {
-//         width: 1280px;
-//         height: 720px;
-//
-//         in property <bool> data_exists;
-//         callback upload_file_clicked <=> upload_btn.clicked;
-//
-//         VerticalBox {
-//             Text {
-//                 text: data_exists ? "Found existing data, loading..." : "Please upload an MBOX or JSON file."; }
-//             HorizontalBox {
-//                 upload_btn := Button { text: "Upload"; }
-//             }
-//         }
-//     }
-// }
-
-
-// fn main() {
-//     send_file().unwrap();
-// }
