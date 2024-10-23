@@ -5,7 +5,7 @@ use std::error::Error;
 use std::fs;
 use std::fs::File;
 use std::fs::metadata;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::net::{Ipv4Addr, SocketAddrV4};
 use std::net::Shutdown;
 use std::net::{TcpStream};
@@ -89,12 +89,9 @@ fn get_file_name(file_path: &String) -> String {
 //     }
 // }
 
-fn file_progress() {
-
-}
-
 fn send_file() -> std::io::Result<()> {
     println!("Hello Client!");
+    // let mut progress_var = 0;
 
     // let paths = fs::read_dir("/Users/aidengage/dev/senior/cate/file-for-upload/")?;
     let paths = fs::read_dir(PULL_DIR)?;
@@ -118,12 +115,12 @@ fn send_file() -> std::io::Result<()> {
                 match metadata(&full_path) {
                     Ok(metadata) => {
                         file_size = metadata.len();
-                        if file_size < isize::MAX as u64 {
-                            println!("one of your files is too large (over {})", isize::MAX as u64);
-                            // shutdown causes issue when sending nothing
-                            stream.shutdown(Shutdown::Both).expect("shutdown call failed");
-                            continue;
-                        }
+                        // if file_size > isize::MAX as u64 {
+                        //     println!("one of your files is too large (over {})", isize::MAX as u64);
+                        //     // shutdown causes issue when sending nothing
+                        //     stream.shutdown(Shutdown::Both).expect("shutdown call failed");
+                        //     continue;
+                        // }
                         println!("File size: {}", file_size);
                     }
                     Err(error) => {
@@ -156,6 +153,21 @@ fn send_file() -> std::io::Result<()> {
                     _ => {
                         println!("SENT!");
                         stream.write(&message)?;
+
+                        // let mut progress_buffer = [0;1];
+                        // let bool = if progress_buffer[0] == 1 { true } else { false };
+                        // println!("{:?}", bool);
+                        // println!("progress buffer: {:?}", progress_buffer);
+                        // loop {
+                        //     if stream.read(&mut progress_buffer)? == 0 {
+                        //         println!("progress in bytes: {}", progress_var);
+                        //         break;
+                        //     } else {
+                        //         progress_var += 1;
+                        //         print!("|");
+                        //     }
+                        // }
+
                         vec_to_discard(message, name_of_file.clone());
                         remove_file(full_path.to_string());
                         // move_file(DISCARD.to_string() + file_name.as_str());

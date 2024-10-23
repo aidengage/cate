@@ -1,7 +1,8 @@
 use std::fs::File;
 use std::net::{SocketAddrV4, TcpListener, TcpStream};
 use std::thread;
-use std::io::{Read, Write};
+use std::io::{Read, Write, Result};
+use std::sync::{Arc, Mutex};
 
 use crate::{ADDR, PORT, UPLOAD_DIR};
 
@@ -51,18 +52,30 @@ pub fn handle_client(mut stream: TcpStream) {
     let file_size: u64 = u64::from_be_bytes(length_buffer.try_into().unwrap());
     println!("file size in bytes: {}", file_size);
 
+    // multithreading
+
+
+
+
+
+    //
+
     let mut buffer = Vec::new();
     let mut temp_buffer = [0; 1024];
-
     loop {
         // Read from the stream into the buffer
         let bytes_read = stream.read(&mut temp_buffer).unwrap();
-        // print!("|");
+        print!("|");
 
         if bytes_read == 0 {
             // Connection closed or end of stream
-            println!("Client disconnected.\n");
+            // progress[0] = 0;
+            stream.write_all([0; 0].as_ref()).unwrap();
+            println!("\nClient disconnected.");
             break;
+        } else {
+            // send out boolean (single byte representation) to the client
+            // client interprets it and progresses the progress bar
         }
 
         // Process the chunk of data (for demonstration, we append to the data vector)
