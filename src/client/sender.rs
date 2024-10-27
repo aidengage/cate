@@ -34,10 +34,12 @@ fn dir_to_vec(file_path: String) -> Vec<u8> {
 }
 
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
+    // println!("file name: {}", file_name);
+    // println!("upload dir: {}", PULL_DIR);
     if vec.len() == 0 {
         return;
     } else {
-        let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
+        let mut file = File::create(PULL_DIR.to_string() + file_name.as_str()).unwrap();
         file.write_all(&vec).unwrap();
     }
 }
@@ -73,11 +75,12 @@ fn get_file_name(file_path: &String) -> String {
 }
 
 // hmmmmm
-fn move_file(file_path: String) {
+pub fn move_file(file_path: String) {
+    // println!("file path: {:?}", file_path);
     if check_file(&file_path) {
         let file_vector = dir_to_vec(file_path.to_string());
-        // vec_to_file(file_vector, get_file_name(file_path));
-        vec_to_discard(file_vector, file_path.to_string());
+        vec_to_file(file_vector, get_file_name(&file_path));
+        // vec_to_discard(file_vector, file_path.to_string());
     } else {
         println!("File does not exist");
     }
