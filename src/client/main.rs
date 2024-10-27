@@ -23,10 +23,10 @@ const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(192,168,1,104);
 const PORT: u16 = 8000;
 
-fn main() {
-    sender::send_file().unwrap();
-}
-
 fn build_ui() {
 
+}
+
+fn main() {
+    sender::send_file().unwrap();
 }
