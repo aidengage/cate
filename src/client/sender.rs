@@ -8,6 +8,11 @@ use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 
+use gtk::builders::DropTargetAsyncBuilder;
+use gtk::ffi::{GtkBox, GtkDropTargetAsync};
+use gtk::prelude::*;
+use gtk::{gdk, glib, Application, ApplicationWindow, Button, DropTarget, DropTargetAsync, Label};
+
 use crate::{PULL_DIR, DISCARD, ADDR, PORT, UPLOAD_DIR};
 
 fn check_file(file_path: &str) -> bool {
