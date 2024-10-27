@@ -1,19 +1,15 @@
-use std::error::Error;
 use std::fs;
 use std::fs::File;
 use std::fs::metadata;
 use std::io::{Read, Write};
-use std::net::{Ipv4Addr, SocketAddrV4};
+use std::net::SocketAddrV4;
 use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 
-use gtk::builders::DropTargetAsyncBuilder;
-use gtk::ffi::{GtkBox, GtkDropTargetAsync};
-use gtk::prelude::*;
-use gtk::{gdk, glib, Application, ApplicationWindow, Button, DropTarget, DropTargetAsync, Label};
+// use gtk::prelude::*;
 
-use crate::{PULL_DIR, DISCARD, ADDR, PORT, UPLOAD_DIR};
+use crate::{PULL_DIR, DISCARD, ADDR, PORT};
 
 fn check_file(file_path: &str) -> bool {
     if let Ok(_file) = File::open(file_path) {
@@ -150,20 +146,6 @@ pub fn send_file() -> std::io::Result<()> {
                     _ => {
                         println!("SENT!");
                         stream.write(&message)?;
-
-                        // let mut progress_buffer = [0;1];
-                        // let bool = if progress_buffer[0] == 1 { true } else { false };
-                        // println!("{:?}", bool);
-                        // println!("progress buffer: {:?}", progress_buffer);
-                        // loop {
-                        //     if stream.read(&mut progress_buffer)? == 0 {
-                        //         println!("progress in bytes: {}", progress_var);
-                        //         break;
-                        //     } else {
-                        //         progress_var += 1;
-                        //         print!("|");
-                        //     }
-                        // }
 
                         vec_to_discard(message, name_of_file.clone());
                         remove_file(full_path.to_string());

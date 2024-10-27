@@ -3,12 +3,10 @@ mod sender;
 use std::error::Error;
 use std::io::{Read, Write};
 use std::net::Ipv4Addr;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use gtk::builders::DropTargetAsyncBuilder;
-use gtk::ffi::{GtkBox, GtkDropTargetAsync};
 use gtk::prelude::*;
-use gtk::{gdk, glib, Application, ApplicationWindow, Button, DropTarget, DropTargetAsync, Label};
+use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label};
 
 const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
 const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
@@ -21,19 +19,19 @@ const APP_ID: &str = "cate";
 fn build_ui(app: &Application) {
     let window = ApplicationWindow::builder()
         .application(app)
-        .title("Drag & Drop test")
-        .default_width(640)
-        .default_height(360)
+        .title("Cate")
+        .default_width(320)
+        .default_height(180)
         .build();
 
     let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
 
     let label = Label::builder()
-        .label("Drag files here")
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
+        .label("Drop Files Here")
+        .margin_top(24)
+        .margin_bottom(24)
+        .margin_start(24)
+        .margin_end(24)
         .build();
 
     vbox.append(&label);
@@ -50,7 +48,7 @@ fn build_ui(app: &Application) {
                 // You can process the file here
                 sender::move_file(path.to_str().unwrap().to_string());
                 // println!("{}", path.to_str().unwrap());
-                // sender::send_file().unwrap();
+                sender::send_file().unwrap();
             }
         }
         // Return true to indicate the drop was handled
