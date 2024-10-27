@@ -8,7 +8,7 @@ use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 
-use crate::{PULL_DIR, DISCARD, ADDR, PORT, sender};
+use crate::{PULL_DIR, DISCARD, ADDR, PORT, UPLOAD_DIR};
 
 fn check_file(file_path: &str) -> bool {
     if let Ok(_file) = File::open(file_path) {
@@ -28,14 +28,14 @@ fn dir_to_vec(file_path: String) -> Vec<u8> {
     }
 }
 
-// fn vec_to_file(vec: Vec<u8>, file_name: String) {
-//     if vec.len() == 0 {
-//         return;
-//     } else {
-//         let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-//         file.write_all(&vec).unwrap();
-//     }
-// }
+fn vec_to_file(vec: Vec<u8>, file_name: String) {
+    if vec.len() == 0 {
+        return;
+    } else {
+        let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
+        file.write_all(&vec).unwrap();
+    }
+}
 
 fn vec_to_discard(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
@@ -88,7 +88,7 @@ pub fn send_file() -> std::io::Result<()> {
     // let mut file_name = String::new();
     for path in paths {
         let directory = path?.path().display().to_string();
-        let file_name = sender::get_file_name(&directory);
+        let file_name = get_file_name(&directory);
         // file_name = get_file_name(&path?.path().display().to_string());
         if file_name.as_bytes()[0] as char != '.' {
             // println!("Path: {}", directory);

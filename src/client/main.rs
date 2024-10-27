@@ -10,7 +10,7 @@ use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 
-// const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
+const UPLOAD_DIR: &str = "/Users/aidengage/dev/senior/cate/file-uploaded/";
 const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
 const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
 const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
