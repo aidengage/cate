@@ -1,6 +1,3 @@
-use slint;
-slint::include_modules!();
-
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -182,21 +179,6 @@ fn send_file() -> std::io::Result<()> {
     Ok(())
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() {
 
-    println!("max size: {}", isize::MAX as usize);
-
-    let ui = AppWindow::new()?;
-
-    println!("window size: {:?}", ui.window().size());
-
-    ui.on_request_send_file({
-        move || {
-            send_file().unwrap();
-        }
-    });
-
-    ui.run()?;
-
-    Ok(())
 }
