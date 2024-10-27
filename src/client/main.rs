@@ -1,3 +1,19 @@
+<<<<<<< HEAD
+=======
+// mod filedrop;
+// slint?::include_modules!();
+
+// use slint;
+//
+// use winit::{
+//     event::{Event, WindowEvent},
+//     event_loop::{ControlFlow, EventLoop},
+//     // platform::macos::WindowExtMacOS,
+//     window::Window,
+// };
+// use winit::platform::run_on_demand::EventLoopExtRunOnDemand;
+
+>>>>>>> 862c09c3d706b4d54a13a8edb863312701dd32ab
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -18,13 +34,13 @@ const PORT: u16 = 8000;
 
 
 
-// fn check_file(file_path: &str) -> bool {
-//     if let Ok(_file) = File::open(file_path) {
-//         true
-//     } else {
-//         false
-//     }
-// }
+fn check_file(file_path: &str) -> bool {
+    if let Ok(_file) = File::open(file_path) {
+        true
+    } else {
+        false
+    }
+}
 
 fn dir_to_vec(file_path: String) -> Vec<u8> {
     let clean_path: String = file_path.clone().trim().to_string();
@@ -76,15 +92,15 @@ fn get_file_name(file_path: &String) -> String {
 }
 
 // hmmmmm
-// fn move_file(file_path: String) {
-//     if check_file(&file_path) {
-//         let file_vector = dir_to_vec(file_path.to_string());
-//         // vec_to_file(file_vector, get_file_name(file_path));
-//         vec_to_discard(file_vector, file_path.to_string());
-//     } else {
-//         println!("File does not exist");
-//     }
-// }
+fn move_file(file_path: String) {
+    if check_file(&file_path) {
+        let file_vector = dir_to_vec(file_path.to_string());
+        // vec_to_file(file_vector, get_file_name(file_path));
+        vec_to_discard(file_vector, file_path.to_string());
+    } else {
+        println!("File does not exist");
+    }
+}
 
 fn send_file() -> std::io::Result<()> {
     println!("Hello Client!");
@@ -181,4 +197,41 @@ fn send_file() -> std::io::Result<()> {
 
 fn main() {
 
+<<<<<<< HEAD
+=======
+    println!("max size: {}", isize::MAX as usize);
+
+    // let ui = AppWindow::new()?;
+
+    //
+    // let event_loop = EventLoop::new();
+    // let window = Window::default_attributes();
+
+    //
+
+    // println!("window size: {:?}", ui.window().size());
+
+    //
+    // event_loop.unwrap().run_app(&mut move |event, _, control_flow: ControlFlow| {
+    //     *control_flow = ControlFlow::Wait;
+    //
+    //     match event {
+    //         Event::WindowEvent { event: WindowEvent::DroppedFile(path), .. } => {
+    //             println!("file path: {:?}", path);
+    //         }
+    //         _ => (),
+    //     }
+    // }).expect("this panic message means something idk");
+    //
+
+    // ui.on_request_send_file({
+    //     move || {
+    //         send_file().unwrap();
+    //     }
+    // });
+
+    // ui.run()?;
+
+    Ok(())
+>>>>>>> 862c09c3d706b4d54a13a8edb863312701dd32ab
 }
