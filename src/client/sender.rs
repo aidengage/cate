@@ -1,7 +1,7 @@
 use std::fs;
 use std::fs::File;
 use std::fs::metadata;
-use std::io::{Read, Write};
+use std::io::Write;
 use std::net::SocketAddrV4;
 use std::net::Shutdown;
 use std::net::{TcpStream};

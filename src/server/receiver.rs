@@ -1,8 +1,7 @@
 use std::fs::File;
 use std::net::{SocketAddrV4, TcpListener, TcpStream};
 use std::thread;
-use std::io::{Read, Write, Result};
-use std::sync::{Arc, Mutex};
+use std::io::{Read, Write};
 
 use crate::{ADDR, PORT, UPLOAD_DIR};
 

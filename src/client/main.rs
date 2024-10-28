@@ -1,7 +1,5 @@
 mod sender;
 
-use std::error::Error;
-use std::io::{Read, Write};
 use std::net::Ipv4Addr;
 use std::path::PathBuf;
 
