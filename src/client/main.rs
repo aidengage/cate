@@ -3,8 +3,9 @@ mod sender;
 use std::net::Ipv4Addr;
 use std::path::PathBuf;
 
+use gdk::Display;
 use gtk::prelude::*;
-use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label};
+use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label, CssProvider};
 
 const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
 const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
@@ -49,6 +50,7 @@ fn build_ui(app: &Application) {
                 sender::send_file().unwrap();
             }
         }
+
         // Return true to indicate the drop was handled
         true
     });
@@ -60,11 +62,24 @@ fn build_ui(app: &Application) {
     window.present();
 }
 
+fn load_css() {
+    let styling = CssProvider::new();
+    // styling.load_from_path("./client.css");
+    styling.load_from_string(include_str!("./client.css"));
+
+    gtk::style_context_add_provider_for_display(
+        &Display::default().expect("Couldn't get default display"),
+        &styling,
+        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
+}
+
 fn main() -> glib::ExitCode {
     println!("Hello, world!");
 
     let app = Application::builder().application_id(APP_ID).build();
 
+    app.connect_startup(|_| load_css());
     app.connect_activate(build_ui);
 
     app.run()
