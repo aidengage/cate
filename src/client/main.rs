@@ -5,7 +5,8 @@ use std::path::PathBuf;
 
 use gdk::Display;
 use gtk::prelude::*;
-use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label, CssProvider};
+use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label, CssProvider, Stack, Button, Box};
+use gtk::glib::clone;
 
 const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
 const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
@@ -23,7 +24,9 @@ fn build_ui(app: &Application) {
         .default_height(180)
         .build();
 
-    let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
+    let page_stack = Stack::new();
+
+    let vbox_home = gtk::Box::new(gtk::Orientation::Vertical, 0);
 
     let label = Label::builder()
         .label("Drop Files Here")
@@ -33,7 +36,16 @@ fn build_ui(app: &Application) {
         .margin_end(24)
         .build();
 
-    vbox.append(&label);
+    vbox_home.append(&label);
+
+    // i dont know what the fuck i am doing this worked because clone :)
+    // had a borrow issue??
+    let page_copy = page_stack.clone();
+    let button_to_page2 = Button::with_label("page 2");
+    button_to_page2.connect_clicked(clone!(@weak app => move |_| {
+        page_copy.set_visible_child_name("page2");
+    }));
+    vbox_home.append(&button_to_page2);
 
     let drop_target = DropTarget::new(gdk::FileList::static_type(), gdk::DragAction::COPY);
 
@@ -55,9 +67,32 @@ fn build_ui(app: &Application) {
         true
     });
 
-    vbox.add_controller(drop_target);
+    vbox_home.add_controller(drop_target);
 
-    window.set_child(Some(&vbox));
+    page_stack.add_named(&vbox_home, Option::from("home"));
+
+    let vbox_page2 = gtk::Box::new(gtk::Orientation::Vertical, 0);
+
+    let label_page2 = Label::builder()
+        .label("another page")
+        .margin_top(24)
+        .margin_bottom(24)
+        .margin_start(24)
+        .margin_end(24)
+        .build();
+    vbox_page2.append(&label_page2);
+
+    let button_back_home = Button::with_label("Back to Page 1");
+    button_back_home.connect_clicked(clone!(@weak page_stack => move |_| {
+        page_stack.set_visible_child_name("home");
+    }));
+
+    vbox_page2.append(&button_back_home);
+
+    page_stack.add_named(&vbox_page2, Option::from("page2"));
+
+    window.set_child(Some(&page_stack));
+    // window.set_child(Some(&vbox_home));
 
     window.present();
 }
