@@ -42,9 +42,10 @@ fn build_ui(app: &Application) {
     // had a borrow issue??
     let page_copy = page_stack.clone();
     let button_to_page2 = Button::with_label("page 2");
-    button_to_page2.connect_clicked(clone!(@weak app => move |_| {
-        page_copy.set_visible_child_name("page2");
-    }));
+    // button_to_page2.connect_clicked(clone!(@weak app => move |_| {
+    //     page_copy.set_visible_child_name("page2");
+    // }));
+    button_to_page2.connect_clicked(move |_| {page_copy.set_visible_child_name("page2")});
     vbox_home.append(&button_to_page2);
 
     let drop_target = DropTarget::new(gdk::FileList::static_type(), gdk::DragAction::COPY);
