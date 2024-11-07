@@ -13,7 +13,7 @@ const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
 const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(192,168,1,104);
 const PORT: u16 = 8000;
-const APP_ID: &str = "cate";
+const APP_ID: &str = "carbon";
 
 fn build_ui(app: &Application) {
     // creating stacks
@@ -37,13 +37,13 @@ fn build_ui(app: &Application) {
     // building everything
     let window = ApplicationWindow::builder()
         .application(app)
-        .title("Cate")
+        .title("Carbon")
         .default_width(320)
         .default_height(180)
         .build();
 
     let label = Label::builder()
-        .label("Drop Files Here")
+        .label("Carbon")
         .margin_top(24)
         .margin_bottom(24)
         .margin_start(24)

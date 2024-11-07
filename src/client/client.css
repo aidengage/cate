@@ -6,7 +6,8 @@
 
 label {
     font-size: 40px;
-    color: #4a4a4a;
+    color: #ff6e91;
+    /*color: #ff80a2;*/
     padding: 10px;
 }
 
@@ -16,12 +17,21 @@ label {
 }
 
 window {
-    background-color: #ff86a7;
+    /*background-color: #ff6e91;*/
+    background-color: #ff80a2;
 }
 
 .custom-button {
     background-color: #7a7a7a;
     color: aquamarine;
     border-radius: 50px;
-    width: 20px;
+    /*width: 20px;*/
+}
+
+.custom-button:hover {
+    background-color: #737373;
+}
+
+.custom-button:active {
+    background-color: #656565;
 }

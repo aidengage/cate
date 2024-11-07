@@ -88,18 +88,16 @@ pub fn send_file() -> std::io::Result<()> {
 
     // let paths = fs::read_dir("/Users/aidengage/dev/senior/cate/file-for-upload/")?;
     let paths = fs::read_dir(PULL_DIR)?;
-    // let mut directory = String::new();
-    // let mut file_name = String::new();
     for path in paths {
+        println!("paths print");
         let directory = path?.path().display().to_string();
         let file_name = get_file_name(&directory);
-        // file_name = get_file_name(&path?.path().display().to_string());
         if file_name.as_bytes()[0] as char != '.' {
-            // println!("Path: {}", directory);
-
-            // }
+            println!("if char");
             let name_of_file = file_name.clone();
+            println!("name of file: {}", name_of_file);
             if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
+                println!("if connect");
                 println!("Connected to the server on {:?}", stream.peer_addr()?);
 
                 let full_path = PULL_DIR.to_string() + name_of_file.as_str();
@@ -120,6 +118,9 @@ pub fn send_file() -> std::io::Result<()> {
                         println!("Error: {}", error);
                     }
                 }
+
+                // let file_size :u64 = metadata(&full_path)?.len();
+                // println!("file size: {}", file_size);
 
                 let name_vec = file_name.into_bytes();
                 let name_len = name_vec.len().to_be_bytes().to_vec();
