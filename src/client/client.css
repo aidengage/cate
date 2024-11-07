@@ -1,13 +1,27 @@
+* {
+    background: transparent;
+    border: none;
+    color: inherit;
+}
+
 label {
-    font-size: 20px;
+    font-size: 40px;
     color: #4a4a4a;
     padding: 10px;
+}
+
+.button-text {
+    color: antiquewhite;
+    font-size: 20px;
 }
 
 window {
     background-color: #ff86a7;
 }
 
-/*button_to_page2 {*/
-/*    color: black;*/
-/*}*/
+.custom-button {
+    background-color: #7a7a7a;
+    color: aquamarine;
+    border-radius: 50px;
+    width: 20px;
+}

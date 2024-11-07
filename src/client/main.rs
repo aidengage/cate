@@ -5,8 +5,7 @@ use std::path::PathBuf;
 
 use gdk::Display;
 use gtk::prelude::*;
-use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label, CssProvider, Stack, Button, Box};
-use gtk::glib::clone;
+use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label, CssProvider, Stack, Button, Box, Align};
 
 const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
 const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
@@ -17,16 +16,31 @@ const PORT: u16 = 8000;
 const APP_ID: &str = "cate";
 
 fn build_ui(app: &Application) {
+    // creating stacks
+    let page_stack = Stack::new();
+    let home_buttons = page_stack.clone();
+    let page2_buttons = page_stack.clone();
+
+    // create buttons
+    let button_to_page2 = Button::new();
+    let button_back_home = Button::with_label("back to page 1");
+
+    // create vbox pages
+    let vbox_home = Box::new(gtk::Orientation::Vertical, 0);
+    let vbox_page2 = Box::new(gtk::Orientation::Vertical, 0);
+    let button_container = Box::new(gtk::Orientation::Vertical, 0);
+    let p2_button_container = Box::new(gtk::Orientation::Vertical, 0);
+
+    // create drag and drop target
+    let drop_target = DropTarget::new(gdk::FileList::static_type(), gdk::DragAction::COPY);
+
+    // building everything
     let window = ApplicationWindow::builder()
         .application(app)
         .title("Cate")
         .default_width(320)
         .default_height(180)
         .build();
-
-    let page_stack = Stack::new();
-
-    let vbox_home = gtk::Box::new(gtk::Orientation::Vertical, 0);
 
     let label = Label::builder()
         .label("Drop Files Here")
@@ -36,43 +50,19 @@ fn build_ui(app: &Application) {
         .margin_end(24)
         .build();
 
-    vbox_home.append(&label);
+    // label.add_css_class("button-text");
 
-    // i dont know what the fuck i am doing this worked because clone :)
-    // had a borrow issue??
-    let page_copy = page_stack.clone();
-    let button_to_page2 = Button::with_label("page 2");
-    // button_to_page2.connect_clicked(clone!(@weak app => move |_| {
-    //     page_copy.set_visible_child_name("page2");
-    // }));
-    button_to_page2.connect_clicked(move |_| {page_copy.set_visible_child_name("page2")});
-    vbox_home.append(&button_to_page2);
+    let button_text = Label::builder()
+        .label("to page 2")
+        .build();
 
-    let drop_target = DropTarget::new(gdk::FileList::static_type(), gdk::DragAction::COPY);
+    button_text.add_css_class("button-text");
 
-    drop_target.connect_drop(move |_, value, _, _| {
-        // println!("value: {:?}", value);
-        // Extract the dropped files
-        if let Ok(file_list) = value.get::<gdk::FileList>() {
-            for file in file_list.files() {
-                let path: PathBuf = file.path().expect("Couldn't get file path");
-                println!("Dropped file: {:?}", path);
-                // You can process the file here
-                sender::move_file(path.to_str().unwrap().to_string());
-                // println!("{}", path.to_str().unwrap());
-                sender::send_file().unwrap();
-            }
-        }
+    let button_text_page2 = Label::builder()
+        .label("back to home page")
+        .build();
 
-        // Return true to indicate the drop was handled
-        true
-    });
-
-    vbox_home.add_controller(drop_target);
-
-    page_stack.add_named(&vbox_home, Option::from("home"));
-
-    let vbox_page2 = gtk::Box::new(gtk::Orientation::Vertical, 0);
+    button_text_page2.add_css_class("button-text");
 
     let label_page2 = Label::builder()
         .label("another page")
@@ -81,32 +71,70 @@ fn build_ui(app: &Application) {
         .margin_start(24)
         .margin_end(24)
         .build();
+
+    drop_target.connect_drop(move |_, value, _, _| {
+        // println!("value: {:?}", value);
+        if let Ok(file_list) = value.get::<gdk::FileList>() {
+            for file in file_list.files() {
+                let path: PathBuf = file.path().expect("Couldn't get file path");
+                println!("Dropped file: {:?}", path);
+                sender::move_file(path.to_str().unwrap().to_string());
+                // println!("{}", path.to_str().unwrap());
+                sender::send_file().unwrap();
+            }
+        }
+        // Return true to indicate the drop was handled
+        true
+    });
+    vbox_home.append(&label);
+    vbox_home.append(&button_to_page2);
+    vbox_home.add_controller(drop_target);
+    // vbox_home.append(&button_text);
+
+
+    button_container.append(&button_text);
+    button_to_page2.set_child(Some(&button_container));
+
+    p2_button_container.append(&button_text_page2);
+    button_back_home.set_child(Some(&p2_button_container));
+    // button_back_home.append(&vbox_page2);
+    // button_back_home.append(&button_back_home)?;
+
+    // textbox.append(&button_text);
+
+    // button_text.add_css_class("button-text");
+    // textbox.add_css_class("button-text");
+    // button_to_page2.append(&button_text).expect("could not add label");
+
+    button_to_page2.connect_clicked(move |_| {home_buttons.set_visible_child_name("page2")});
+    button_to_page2.add_css_class("custom-button");
+
     vbox_page2.append(&label_page2);
 
-    let button_back_home = Button::with_label("Back to Page 1");
-    button_back_home.connect_clicked(clone!(@weak page_stack => move |_| {
-        page_stack.set_visible_child_name("home");
-    }));
+    button_back_home.connect_clicked(move |_| {page2_buttons.set_visible_child_name("home")});
+    button_back_home.add_css_class("custom-button");
 
     vbox_page2.append(&button_back_home);
 
+    page_stack.add_named(&vbox_home, Option::from("home"));
     page_stack.add_named(&vbox_page2, Option::from("page2"));
 
     window.set_child(Some(&page_stack));
-    // window.set_child(Some(&vbox_home));
+    // window.set_child(Some(&button_to_page2));
 
     window.present();
 }
 
 fn load_css() {
+
     let styling = CssProvider::new();
-    // styling.load_from_path("./client.css");
     styling.load_from_string(include_str!("./client.css"));
 
     gtk::style_context_add_provider_for_display(
         &Display::default().expect("Couldn't get default display"),
         &styling,
         gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+        // gtk::STYLE_PROVIDER_PRIORITY_USER,
     );
 }
 
