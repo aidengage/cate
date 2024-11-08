@@ -1,10 +1,9 @@
 use gtk::prelude::*;
-use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label, CssProvider, Stack, Button, Box, Align, Orientation, Entry};
+use gtk::{Label, Stack, Button, Box, Orientation};
 
 pub struct FilePage {
     pub vbox_files: Box,
     pub container: Box,
-    // entry: Entry,
 }
 
 impl FilePage {
@@ -40,32 +39,6 @@ impl FilePage {
         button_back_home.connect_clicked(move |_| {
             stack_clone.set_visible_child_name("home-page")
         });
-
-
-
-
-
-
-
-
-        // Create main container for the page
-
-
-        // Add your page content
-        // let label = Label::new(Some("Welcome to Page Two"));
-        // let entry = Entry::new();
-        // let button = Button::with_label("Submit");
-
-        // Connect signals
-        // let entry_clone = entry.clone();
-        // button.connect_clicked(move |_| {
-        //     println!("Submitted text: {}", entry_clone.text());
-        // });
-
-        // Add widgets to the page
-        // vbox_files.append(&label);
-        // vbox_files.append(&entry);
-        // vbox_files.append(&button);
 
         Self { vbox_files, container }
     }

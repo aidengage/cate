@@ -1,14 +1,13 @@
 use std::path::PathBuf;
 
 use gtk::prelude::*;
-use gtk::{gdk, glib, Application, ApplicationWindow, DropTarget, Label, CssProvider, Stack, Button, Box, Align, Orientation};
+use gtk::{gdk, DropTarget, Label, Stack, Button, Box, Orientation};
 
 use crate::sender;
 
 pub struct HomePage {
     pub vbox_home: Box,
     pub container: Box,
-    // pub button_to_page2: Button,
 }
 
 impl HomePage {
@@ -45,31 +44,8 @@ impl HomePage {
             stack_clone.set_visible_child_name("file-page");
         });
 
-
-
-
-
-
-        // let container = Box::new(Orientation::Vertical, 0);
-        // let vbox_home = Box::new(Orientation::Vertical, 0);
-        // let button_to_page2 = Button::new();
         let drop = DropTarget::new(gdk::FileList::static_type(), gdk::DragAction::COPY);
-        // // let page_stack = Stack::new();
-        //
-        // let label = Label::builder()
-        //     .label("Carbon")
-        //     .margin_top(24)
-        //     .margin_bottom(24)
-        //     .margin_start(24)
-        //     .margin_end(24)
-        //     .build();
-        //
-        // let button_text = Label::builder()
-        //     .label("to page 2")
-        //     .build();
-        //
-        // button_text.add_css_class("button-text");
-        //
+
         drop.connect_drop(move |_, value, _, _| {
             // println!("value: {:?}", value);
             if let Ok(file_list) = value.get::<gdk::FileList>() {
@@ -86,31 +62,6 @@ impl HomePage {
         });
 
         vbox_home.add_controller(drop);
-
-
-        //
-        // vbox_home.append(&label);
-        // vbox_home.append(&button_to_page2);
-        // // vbox_home.add_controller(drop);
-        //
-        // container.append(&button_text);
-        // button_to_page2.set_child(Some(&container));
-        // // button_to_page2.connect_clicked(move |_| {home_buttons.set_visible_child_name("page2")});
-        // button_to_page2.add_css_class("custom-button");
-        // // container.append(&vbox_home);
-        //
-        // let vbox_home = Box::new(Orientation::Vertical, 10);
-        // // vbox_home.set_margin_all(20);
-        //
-        // // let label = Label::new(Some("home page"));
-        // // let button = Button::with_label("button");
-        //
-        // button_to_page2.connect_clicked(|_| {
-        //     println!("button clicked!");
-        // });
-
-        // vbox_home.append(&label);
-        // vbox_home.append(&button_to_page2);
 
         Self { vbox_home, container }
     }
