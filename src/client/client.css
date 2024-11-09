@@ -8,30 +8,61 @@ label {
     font-size: 40px;
     color: #ff6e91;
     /*color: #ff80a2;*/
-    padding: 10px;
+    padding: 5px;
 }
 
 .button-text {
     color: antiquewhite;
-    font-size: 20px;
+    font-size: 15px;
 }
 
 window {
     /*background-color: #ff6e91;*/
-    background-color: #ff87a8;
+    background-color: #ff80a4;
 }
 
 .custom-button {
-    background-color: #7a7a7a;
-    color: aquamarine;
+    /*background-color: #7a7a7a;*/
+    /*color: aquamarine;*/
     border-radius: 50px;
-    /*width: 20px;*/
+    /*border-radius: 10px;*/
+    /*padding: 10px;*/
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+    /*min-height: 200px;*/
+    /*min-width: 200px;*/
+    /*max-height: 300px;*/
+    /*max-width: 300px;*/
+
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: inherit;
+}
+
+button {
+    /*min-height: 200px;*/
+
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+    /*min-width: 200px;*/
+    /*height: 200px;*/
+    /*width: 200px;*/
+    /*max-height: 300px;*/
+    /*max-width: 300px;*/
 }
 
 .custom-button:hover {
-    background-color: #737373;
+    /*background-color: #737373;*/
+    background-color: #ff7396
 }
 
 .custom-button:active {
-    background-color: #656565;
+    /*background-color: #656565;*/
+    background-color: #ff658a
+}
+
+.nav-icon {
+    /*background-color: white;*/
+
 }

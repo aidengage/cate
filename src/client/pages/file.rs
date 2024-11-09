@@ -13,20 +13,27 @@ impl FilePage {
         let container = Box::new(Orientation::Vertical, 0);
 
         let button_back_home = Button::new();
+        // let button_right = Button::new();
+
         button_back_home.add_css_class("custom-button");
+        // button_right.add_css_class("custom-button");
 
         let button_text_page2 = Label::builder()
             .label("back to home page")
+            // .margin_top(10)
+            // .margin_bottom(10)
+            // .margin_start(10)
+            // .margin_end(10)
             .build();
 
         button_text_page2.add_css_class("button-text");
 
         let label_page2 = Label::builder()
-            .label("another page")
-            .margin_top(24)
-            .margin_bottom(24)
-            .margin_start(24)
-            .margin_end(24)
+            .label("Files")
+            .margin_top(10)
+            .margin_bottom(10)
+            .margin_start(10)
+            .margin_end(10)
             .build();
 
         vbox_files.append(&label_page2);
