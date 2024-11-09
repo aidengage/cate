@@ -41,15 +41,15 @@ impl HomePage {
         button_settings.set_hexpand(false); // Disable horizontal expansion
         button_settings.set_vexpand(false); // Disable vertical expansion
 
-        button_settings.set_halign(gtk::Align::Start); // or Center, End depending on where you want it
-        button_settings.set_valign(gtk::Align::Center);
+        button_settings.set_halign(Align::Start); // or Center, End depending on where you want it
+        button_settings.set_valign(Align::Center);
 
         button_files.set_size_request(60, 60);
         button_files.set_hexpand(false); // Disable horizontal expansion
         button_files.set_vexpand(false); // Disable vertical expansion
 
-        button_files.set_halign(gtk::Align::End); // or Center, End depending on where you want it
-        button_files.set_valign(gtk::Align::Center);
+        button_files.set_halign(Align::End); // or Center, End depending on where you want it
+        button_files.set_valign(Align::Center);
 
         // nav_bar.set_width_request(180);
         // nav_bar.set_halign(Align::Center);

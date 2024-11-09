@@ -54,12 +54,12 @@ button {
 
 .custom-button:hover {
     /*background-color: #737373;*/
-    background-color: #ff7396
+    background-color: #ff7396;
 }
 
 .custom-button:active {
     /*background-color: #656565;*/
-    background-color: #ff658a
+    background-color: #ff658a;
 }
 
 .nav-icon {
