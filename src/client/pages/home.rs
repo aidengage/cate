@@ -37,14 +37,14 @@ impl HomePage {
 
         // container.set_width_request(100);
         // container.set_halign(Align::Center);
-        button_settings.set_size_request(60, 60);
+        button_settings.set_size_request(50, 50);
         button_settings.set_hexpand(false); // Disable horizontal expansion
         button_settings.set_vexpand(false); // Disable vertical expansion
 
         button_settings.set_halign(Align::Start); // or Center, End depending on where you want it
         button_settings.set_valign(Align::Center);
 
-        button_files.set_size_request(60, 60);
+        button_files.set_size_request(50, 50);
         button_files.set_hexpand(false); // Disable horizontal expansion
         button_files.set_vexpand(false); // Disable vertical expansion
 

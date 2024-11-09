@@ -5,8 +5,9 @@
 }
 
 label {
-    font-size: 40px;
+    font-size: 50px;
     color: #ff6e91;
+    font-weight: bold;
     /*color: #ff80a2;*/
     padding: 5px;
 }
@@ -50,16 +51,19 @@ button {
     /*width: 200px;*/
     /*max-height: 300px;*/
     /*max-width: 300px;*/
+    padding: 0;
 }
 
 .custom-button:hover {
     /*background-color: #737373;*/
     background-color: #ff7396;
+    padding: 0;
 }
 
 .custom-button:active {
     /*background-color: #656565;*/
     background-color: #ff658a;
+    padding: 0;
 }
 
 .nav-icon {
