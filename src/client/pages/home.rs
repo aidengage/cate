@@ -21,31 +21,35 @@ impl HomePage {
         let container = Box::new(Orientation::Vertical, 0);
         let nav_bar = Box::new(Orientation::Horizontal, 0);
 
-        let button_to_page2 = Button::new();
-        let button_right = Button::new();
+        let button_settings = Button::new();
+        let button_files = Button::new();
 
         let settings_icon = gtk::Image::from_file("assets/settings.png");
         settings_icon.add_css_class("nav-icon");
-        button_to_page2.set_child(Some(&settings_icon));
+        button_settings.set_child(Some(&settings_icon));
 
-        button_to_page2.add_css_class("custom-button");
-        button_right.add_css_class("custom-button");
+        let files_icon = gtk::Image::from_file("assets/files.png");
+        files_icon.add_css_class("nav-icon");
+        button_files.set_child(Some(&files_icon));
+
+        button_settings.add_css_class("custom-button");
+        button_files.add_css_class("custom-button");
 
         // container.set_width_request(100);
         // container.set_halign(Align::Center);
-        button_to_page2.set_size_request(40, 40);
-        button_to_page2.set_hexpand(false); // Disable horizontal expansion
-        button_to_page2.set_vexpand(false); // Disable vertical expansion
+        button_settings.set_size_request(60, 60);
+        button_settings.set_hexpand(false); // Disable horizontal expansion
+        button_settings.set_vexpand(false); // Disable vertical expansion
 
-        button_to_page2.set_halign(gtk::Align::Start); // or Center, End depending on where you want it
-        button_to_page2.set_valign(gtk::Align::Center);
+        button_settings.set_halign(gtk::Align::Start); // or Center, End depending on where you want it
+        button_settings.set_valign(gtk::Align::Center);
 
-        button_right.set_size_request(10, 10);
-        button_right.set_hexpand(false); // Disable horizontal expansion
-        button_right.set_vexpand(false); // Disable vertical expansion
+        button_files.set_size_request(60, 60);
+        button_files.set_hexpand(false); // Disable horizontal expansion
+        button_files.set_vexpand(false); // Disable vertical expansion
 
-        button_right.set_halign(gtk::Align::End); // or Center, End depending on where you want it
-        button_right.set_valign(gtk::Align::Center);
+        button_files.set_halign(gtk::Align::End); // or Center, End depending on where you want it
+        button_files.set_valign(gtk::Align::Center);
 
         // nav_bar.set_width_request(180);
         // nav_bar.set_halign(Align::Center);
@@ -67,11 +71,11 @@ impl HomePage {
 
         container.append(&button_text);
         // button_to_page2.set_child(Some(&container));
-        nav_bar.append(&button_to_page2);
-        // nav_bar.append(&button_right);
+        nav_bar.append(&button_settings);
+        nav_bar.append(&button_files);
 
         let stack_clone = page_stack.clone();
-        button_to_page2.connect_clicked(move |_| {
+        button_settings.connect_clicked(move |_| {
             stack_clone.set_visible_child_name("file-page");
         });
 
