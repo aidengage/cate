@@ -31,8 +31,6 @@ fn dir_to_vec(file_path: String) -> Vec<u8> {
 }
 
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
-    // println!("file name: {}", file_name);
-    // println!("upload dir: {}", PULL_DIR);
     if vec.len() == 0 {
         return;
     } else {
@@ -45,8 +43,6 @@ fn vec_to_discard(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
         return;
     } else {
-        // let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
-        // let mut file = File::create("/Users/aidengage/dev/senior/cate/discard/".to_string() + file_name.as_str()).unwrap();
         let mut file = File::create(DISCARD.to_string() + file_name.as_str()).unwrap();
         file.write_all(&vec).unwrap();
     }
@@ -73,11 +69,9 @@ fn get_file_name(file_path: &String) -> String {
 
 // hmmmmm
 pub fn move_file(file_path: String) {
-    // println!("file path: {:?}", file_path);
     if check_file(&file_path) {
         let file_vector = dir_to_vec(file_path.to_string());
         vec_to_file(file_vector, get_file_name(&file_path));
-        // vec_to_discard(file_vector, file_path.to_string());
     } else {
         println!("File does not exist");
     }
@@ -120,24 +114,15 @@ pub fn send_file() -> Result<()> {
                     }
                 }
 
-                // let file_size :u64 = metadata(&full_path)?.len();
-                // println!("file size: {}", file_size);
-
                 let name_vec = file_name.into_bytes();
                 let name_len = name_vec.len().to_be_bytes().to_vec();
 
                 stream.write(&name_len)?;
                 // println!("name vec: {:?}", name_vec);
                 stream.write_all(&name_vec)?;
-
-
-
                 let message = dir_to_vec(full_path.clone());
 
-                // let length = vec![message.len() as u8];
                 let size_array = file_size.to_be_bytes().to_vec();
-
-                // println!("size array: {:?}", size_array);
 
                 stream.write(&size_array)?;
 
@@ -152,59 +137,40 @@ pub fn send_file() -> Result<()> {
 
                         vec_to_discard(message, name_of_file.clone());
                         remove_file(full_path.to_string());
-                        // move_file(DISCARD.to_string() + file_name.as_str());
                         receive_link(stream).expect("Failed to receive link");
-                        // receive_link(stream);
                     }
                 }
-                // receive_link(stream).expect("Failed to receive link");
-                // receive_link(stream);
-                // let mut message_length_buffer = [0u8; 8];
-                // stream.read(&mut message_length_buffer).expect("Failed to read message length");
-                // let message_length = u64::from_be_bytes(message_length_buffer);
-                //
-                // let mut message_buffer = vec![0u8; message_length as usize];
-                // stream.read_exact(&mut message_buffer).expect("Failed to read message");
-                // let message = String::from_utf8(message_buffer).expect("Invalid UTF-8 message");
-                // println!("Server response: {}", message);
             } else {
                 println!("Couldn't connect to server...");
             }
         }
     }
-
-    /////////////////////////////////
-    //     receive from server     //
-    /////////////////////////////////
-
-    // let mut buffer = Vec::new();
-    // let mut temp_buffer = [0u8; 1024];
-
-
-    // receive_file().expect("pain");
-
     Ok(())
 }
+
+/////////////////////////////////
+//     receive from server     //
+/////////////////////////////////
 
 fn receive_link(mut stream: TcpStream) -> Result<()> {
     // if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
     println!("connected back to server after send");
     let mut message_length_buffer = [0u8; 8];
-    println!("message length buffer: {:?}", message_length_buffer);
+    // println!("message length buffer: {:?}", message_length_buffer);
     // message_length_buffer = [0, 0, 0, 0, 0, 0, 0, 17];
     // println!("debug 1");
     stream.read_exact(&mut message_length_buffer)?;
 
-    println!("message length buffer: {:?}", message_length_buffer);
+    // println!("message length buffer: {:?}", message_length_buffer);
     // stream.read_to_end(&mut buffer);
     // println!("debug 2");
     let message_length = u64::from_be_bytes(message_length_buffer);
-    println!("Message length: {}", message_length);
+    // println!("Message length: {}", message_length);
     let mut message_buffer = vec![0u8; message_length as usize];
-    println!("message buffer: {:?}", message_buffer);
+    // println!("message buffer: {:?}", message_buffer);
     // let mut message_buffer = vec![0u8; 17];
     stream.read_exact(&mut message_buffer).unwrap();
-    println!("message buffer: {:?}", message_buffer);
+    // println!("message buffer: {:?}", message_buffer);
 
     // let message = String::from_utf8_lossy(&buffer).to_string();
     // let message = String::from_utf8_lossy(&message_buffer).to_string();
