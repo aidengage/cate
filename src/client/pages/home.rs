@@ -1,13 +1,14 @@
 use std::path::PathBuf;
 
 use gtk::prelude::*;
-use gtk::{gdk, DropTarget, Label, Stack, Button, Box, Orientation, CssProvider, Align};
+use gtk::{gdk, DropTarget, Label, Stack, Button, Box, Orientation, CssProvider, Align, Justification, Overlay};
 
 use crate::sender;
 
 pub struct HomePage {
     pub vbox_home: Box,
     pub container: Box,
+    pub overlay: Overlay,
     // pub page_stack: Stack,
 }
 
@@ -15,6 +16,7 @@ impl HomePage {
     pub fn new(page_stack: &Stack) -> Self {
 
         let vbox_home = Box::new(Orientation::Vertical, 10);
+        let background = Box::new(Orientation::Horizontal, 10);
         // let nav_bar = Self::generate_nav();
 
 
@@ -97,18 +99,28 @@ impl HomePage {
         // fixed.put(&button_to_page2, 0f64, 0f64);
         // grid.attach(&button_to_page2, 0, 0, 1, 1);
 
-        let label_page2 = Label::builder()
+        let label = Label::builder()
             .label("CARBON")
-            .margin_top(10)
-            .margin_bottom(10)
-            .margin_start(10)
-            .margin_end(10)
+            .justify(Justification::Center)
+            // .halign(Align::Center)
+            // .valign(Align::Center)
+            // .margin_top(10)
+            // .margin_bottom(10)
+            // .margin_start(10)
+            // .margin_end(10)
             .build();
-
+        background.set_halign(Align::Center);
+        background.set_valign(Align::Center);
+        background.set_vexpand(true);
+        background.set_hexpand(true);
 
         vbox_home.append(&nav_bar);
-        vbox_home.append(&label_page2);
+        background.append(&label);
+        // vbox_home.append(&background);
 
+        let overlay = Overlay::new();
+        overlay.set_child(Some(&background));
+        overlay.add_overlay(&vbox_home);
 
 
         let drop = DropTarget::new(gdk::FileList::static_type(), gdk::DragAction::COPY);
@@ -130,7 +142,7 @@ impl HomePage {
 
         vbox_home.add_controller(drop);
 
-        Self { vbox_home, container }
+        Self { vbox_home, container, overlay }
     }
 
     fn generate_nav() -> gtk::Box {

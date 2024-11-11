@@ -1,6 +1,6 @@
 mod sender;
 mod pages;
-use pages::{home::HomePage, file::FilePage};
+use pages::{home::HomePage, file::FilePage, setting::SettingPage};
 
 use std::net::Ipv4Addr;
 
@@ -14,7 +14,7 @@ const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
 const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(192,168,1,104);
 const PORT: u16 = 8000;
-const APP_ID: &str = "carbon";
+const APP_ID: &str = "com.aidengage.carbon";
 
 
 
@@ -57,10 +57,13 @@ impl App {
         // Initialize pages
         let home = HomePage::new(&self.page_stack);
         let file = FilePage::new(&self.page_stack);
+        let setting = SettingPage::new(&self.page_stack);
 
         // Add pages to stack
-        self.page_stack.add_named(&home.vbox_home, Some("home-page"));
+        // self.page_stack.add_named(&home.vbox_home, Some("home-page"));
+        self.page_stack.add_named(&home.overlay, Some("home-page"));
         self.page_stack.add_named(&file.vbox_files, Some("file-page"));
+        self.page_stack.add_named(&setting.vbox_settings, Some("setting-page"));
     }
 }
 
