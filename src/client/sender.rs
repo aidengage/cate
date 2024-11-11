@@ -1,13 +1,14 @@
 use std::fs;
 use std::fs::File;
 use std::fs::metadata;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::net::SocketAddrV4;
 use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
+use std::io::Result;
 
-// use gtk::prelude::*;
+use gtk::prelude::*;
 
 use crate::{PULL_DIR, DISCARD, ADDR, PORT};
 
@@ -82,7 +83,7 @@ pub fn move_file(file_path: String) {
     }
 }
 
-pub fn send_file() -> std::io::Result<()> {
+pub fn send_file() -> Result<()> {
     println!("Hello Client!");
     // let mut progress_var = 0;
 
@@ -147,17 +148,68 @@ pub fn send_file() -> std::io::Result<()> {
                     _ => {
                         println!("SENT!");
                         stream.write(&message)?;
+                        stream.shutdown(Shutdown::Write)?;
 
                         vec_to_discard(message, name_of_file.clone());
                         remove_file(full_path.to_string());
                         // move_file(DISCARD.to_string() + file_name.as_str());
+                        receive_link(stream).expect("Failed to receive link");
+                        // receive_link(stream);
                     }
                 }
+                // receive_link(stream).expect("Failed to receive link");
+                // receive_link(stream);
+                // let mut message_length_buffer = [0u8; 8];
+                // stream.read(&mut message_length_buffer).expect("Failed to read message length");
+                // let message_length = u64::from_be_bytes(message_length_buffer);
+                //
+                // let mut message_buffer = vec![0u8; message_length as usize];
+                // stream.read_exact(&mut message_buffer).expect("Failed to read message");
+                // let message = String::from_utf8(message_buffer).expect("Invalid UTF-8 message");
+                // println!("Server response: {}", message);
             } else {
                 println!("Couldn't connect to server...");
             }
         }
     }
+
+    /////////////////////////////////
+    //     receive from server     //
+    /////////////////////////////////
+
+    // let mut buffer = Vec::new();
+    // let mut temp_buffer = [0u8; 1024];
+
+
+    // receive_file().expect("pain");
+
+    Ok(())
+}
+
+fn receive_link(mut stream: TcpStream) -> Result<()> {
+    // if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
+    println!("connected back to server after send");
+    let mut message_length_buffer = [0u8; 8];
+    println!("message length buffer: {:?}", message_length_buffer);
+    // message_length_buffer = [0, 0, 0, 0, 0, 0, 0, 17];
+    // println!("debug 1");
+    stream.read_exact(&mut message_length_buffer)?;
+
+    println!("message length buffer: {:?}", message_length_buffer);
+    // stream.read_to_end(&mut buffer);
+    // println!("debug 2");
+    let message_length = u64::from_be_bytes(message_length_buffer);
+    println!("Message length: {}", message_length);
+    let mut message_buffer = vec![0u8; message_length as usize];
+    println!("message buffer: {:?}", message_buffer);
+    // let mut message_buffer = vec![0u8; 17];
+    stream.read_exact(&mut message_buffer).unwrap();
+    println!("message buffer: {:?}", message_buffer);
+
+    // let message = String::from_utf8_lossy(&buffer).to_string();
+    // let message = String::from_utf8_lossy(&message_buffer).to_string();
+    let message = String::from_utf8(message_buffer).unwrap();
+    println!("message receive: {}", message);
 
     Ok(())
 }

@@ -69,16 +69,51 @@ pub fn handle_client(mut stream: TcpStream) {
         if bytes_read == 0 {
             // Connection closed or end of stream
             // progress[0] = 0;
-            stream.write_all([0; 0].as_ref()).unwrap();
-            println!("\nClient disconnected.");
+            // stream.write_all([0; 0].as_ref()).unwrap();
+            // println!("\nClient disconnected.");
+            println!("\nfile received, sending link");
+            // let tcp_clone = stream.try_clone().unwrap();
+            // send_link(tcp_clone);
+            // send_link(stream);
             break;
         } else {
             // send out boolean (single byte representation) to the client
             // client interprets it and progresses the progress bar
+            // let tcp_clone = stream.try_clone().unwrap();
+            // send_link(tcp_clone);
+            // send_link(stream);
+            // break;
         }
 
+        // let tcp_clone = stream.try_clone().unwrap();
+        // send_link(tcp_clone);
         // Process the chunk of data (for demonstration, we append to the data vector)
         buffer.extend_from_slice(&temp_buffer[..bytes_read]);
     }
+
     vec_to_file(buffer, file_name.to_string());
+    let tcp_clone = stream.try_clone().unwrap();
+    send_link(tcp_clone);
+
+
+    ///////////////////////////////////
+    //      send back to client      //
+    ///////////////////////////////////
+
+    // let message_back = "hello from server";
+    // let message_length = message_back.len() as u64;
+    // println!("message length: {:?}", message_length.to_be_bytes());
+    // // stream.write_all(&message_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
+    // // stream.write_all(message_back.as_bytes()).unwrap();
+    // println!("message sent to client: {}", message_back);
+}
+
+fn send_link(mut stream: TcpStream) {
+    let message_back = "hello from server this is pain";
+    let message_length = message_back.len() as u64;
+    println!("message length: {:?}", message_length.to_be_bytes());
+    println!("message: {:?}", message_back);
+    stream.write_all(&message_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
+    stream.write_all(message_back.as_bytes()).expect("could not send file");
+    // println!("message sent to client: {}", message_back);
 }
