@@ -11,6 +11,7 @@ impl SettingPage {
         let vbox_settings = Box::new(Orientation::Vertical, 0);
         let container = Box::new(Orientation::Horizontal, 0);
 
+
         let button_home = Button::new();
         button_home.add_css_class("custom-button");
         button_home.set_size_request(50, 50);
@@ -21,6 +22,7 @@ impl SettingPage {
         button_home.connect_clicked(move |_| {
             stack_clone.set_visible_child_name("home-page");
         });
+        button_home.add_css_class("custom-button");
         vbox_settings.append(&button_home);
 
         Self { vbox_settings, container }

@@ -13,10 +13,11 @@ impl FilePage {
         let container = Box::new(Orientation::Vertical, 0);
 
         let button_back_home = Button::new();
-        // let button_right = Button::new();
+        // button_back_home.set_size_request(50, 50);
+        // button_back_home.set_vexpand(false);
+        // button_back_home.set_hexpand(false);
 
         button_back_home.add_css_class("custom-button");
-        // button_right.add_css_class("custom-button");
 
         let button_text_page2 = Label::builder()
             .label("back to home page")
@@ -46,6 +47,7 @@ impl FilePage {
         button_back_home.connect_clicked(move |_| {
             stack_clone.set_visible_child_name("home-page")
         });
+        button_back_home.add_css_class("custom-button");
 
         Self { vbox_files, container }
     }
