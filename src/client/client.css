@@ -23,18 +23,7 @@ window {
 }
 
 .custom-button {
-    /*background-color: #7a7a7a;*/
-    /*color: aquamarine;*/
     border-radius: 50px;
-    /*border-radius: 10px;*/
-    /*padding: 10px;*/
-    /*margin-left: auto;*/
-    /*margin-right: auto;*/
-    /*min-height: 200px;*/
-    /*min-width: 200px;*/
-    /*max-height: 300px;*/
-    /*max-width: 300px;*/
-
     background: transparent;
     border: none;
     box-shadow: none;
@@ -42,15 +31,6 @@ window {
 }
 
 button {
-    /*min-height: 200px;*/
-
-    /*margin-left: auto;*/
-    /*margin-right: auto;*/
-    /*min-width: 200px;*/
-    /*height: 200px;*/
-    /*width: 200px;*/
-    /*max-height: 300px;*/
-    /*max-width: 300px;*/
     padding: 0;
 }
 

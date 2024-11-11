@@ -33,7 +33,7 @@ impl App {
         let window = ApplicationWindow::new(app);
         window.set_title(Some("Carbon"));
         // window.set_default_size(800, 600);
-        window.set_default_size(320, 180);
+        window.set_default_size(350, 200);
 
         // Create the stack for managing pages
         let page_stack = Stack::new();

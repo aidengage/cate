@@ -19,7 +19,7 @@ impl SettingPage {
 
         let stack_clone = page_stack.clone();
         button_home.connect_clicked(move |_| {
-            stack_clone.set_visible_child_name("setting-page");
+            stack_clone.set_visible_child_name("home-page");
         });
         vbox_settings.append(&button_home);
 

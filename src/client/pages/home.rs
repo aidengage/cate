@@ -76,11 +76,15 @@ impl HomePage {
         nav_bar.append(&button_settings);
         nav_bar.append(&button_files);
 
-        let stack_clone = page_stack.clone();
+        let stack_setting = page_stack.clone();
         button_settings.connect_clicked(move |_| {
-            stack_clone.set_visible_child_name("file-page");
+            stack_setting.set_visible_child_name("setting-page");
         });
 
+        let stack_file = page_stack.clone();
+        button_files.connect_clicked(move |_| {
+            stack_file.set_visible_child_name("file-page");
+        });
 
 
         let fixed = gtk::Fixed::new();
