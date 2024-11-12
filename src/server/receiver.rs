@@ -70,20 +70,25 @@ pub fn handle_client(mut stream: TcpStream) {
 
     vec_to_file(buffer, file_name.to_string());
     let tcp_clone = stream.try_clone().unwrap();
-    send_link(tcp_clone);
+    let link = generate_link(file_name);
+    send_link(tcp_clone, link);
 }
 
 ///////////////////////////////////
 //      send back to client      //
 ///////////////////////////////////
 
-fn send_link(mut stream: TcpStream) {
-    let message_back = "hello from server this is pain";
-    let message_length = message_back.len() as u64;
-    println!("message length: {:?}", message_length.to_be_bytes());
-    println!("message: {:?}", message_back);
-    stream.write_all(&message_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
-    stream.write_all(message_back.as_bytes()).expect("could not send file");
+fn send_link(mut stream: TcpStream, link: String) {
+    // let message_back = "hello from server this is pain";
+    // let message_length = message_back.len() as u64;
+    // println!("message length: {:?}", message_length.to_be_bytes());
+    // println!("message: {:?}", message_back);
+    // stream.write_all(&message_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
+    // stream.write_all(message_back.as_bytes()).expect("could not send file");
+    let link_length = link.len() as u64;
+    println!("message: {:?}", link);
+    stream.write_all(&link_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
+    stream.write_all(link.as_bytes()).expect("could not send file");
 }
 
 fn get_file_name(file_path: &String) -> String {
@@ -101,15 +106,18 @@ fn get_file_name(file_path: &String) -> String {
     file_name
 }
 
-// fn generate_link() {
-//     let paths = fs::read_dir(UPLOAD_DIR);
-//     for path in paths {
-//         let directory = path?.path().display().to_string();
-//         let file_name = get_file_name(&directory);
-//         if file_name.as_bytes()[0] as char != '.' {
-//
-//         }
-//     }
-//
-//     // Ok(())
-// }
+fn generate_link(file_name: String) -> String {
+    // let paths = fs::read_dir(UPLOAD_DIR);
+    // for path in paths {
+    //     let directory = path?.path().display().to_string();
+    //     let file_name = get_file_name(&directory);
+    //     if file_name.as_bytes()[0] as char != '.' {
+    //
+    //     }
+    // }
+
+    let link = ADDR.to_string() + "/files/" + file_name.as_str();
+    println!("link: {}", link);
+    link
+    // Ok(())
+}
