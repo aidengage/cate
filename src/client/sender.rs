@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, io};
 use std::fs::File;
 use std::fs::metadata;
 use std::io::{Read, Write};
@@ -7,6 +7,7 @@ use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 use std::io::Result;
+use std::io::ErrorKind;
 
 use gtk::prelude::*;
 
@@ -84,11 +85,11 @@ pub fn send_file() -> Result<()> {
     // let paths = fs::read_dir("/Users/aidengage/dev/senior/cate/file-for-upload/")?;
     let paths = fs::read_dir(PULL_DIR)?;
     for path in paths {
-        println!("paths print");
+        // println!("paths print");
         let directory = path?.path().display().to_string();
         let file_name = get_file_name(&directory);
         if file_name.as_bytes()[0] as char != '.' {
-            println!("if char");
+            // println!("if char");
             let name_of_file = file_name.clone();
             println!("name of file: {}", name_of_file);
             if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
@@ -153,29 +154,43 @@ pub fn send_file() -> Result<()> {
 /////////////////////////////////
 
 fn receive_link(mut stream: TcpStream) -> Result<()> {
-    // if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
-    println!("connected back to server after send");
-    let mut message_length_buffer = [0u8; 8];
-    // println!("message length buffer: {:?}", message_length_buffer);
-    // message_length_buffer = [0, 0, 0, 0, 0, 0, 0, 17];
-    // println!("debug 1");
-    stream.read_exact(&mut message_length_buffer)?;
+    // if check_connection(stream) {
 
-    // println!("message length buffer: {:?}", message_length_buffer);
-    // stream.read_to_end(&mut buffer);
-    // println!("debug 2");
-    let message_length = u64::from_be_bytes(message_length_buffer);
-    // println!("Message length: {}", message_length);
-    let mut message_buffer = vec![0u8; message_length as usize];
-    // println!("message buffer: {:?}", message_buffer);
-    // let mut message_buffer = vec![0u8; 17];
-    stream.read_exact(&mut message_buffer).unwrap();
-    // println!("message buffer: {:?}", message_buffer);
+        // if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
+        println!("connected back to server after send");
+        let mut message_length_buffer = [0u8; 8];
+        // println!("message length buffer: {:?}", message_length_buffer);
+        // println!("debug 1");
+        stream.read_exact(&mut message_length_buffer)?;
 
-    // let message = String::from_utf8_lossy(&buffer).to_string();
-    // let message = String::from_utf8_lossy(&message_buffer).to_string();
-    let message = String::from_utf8(message_buffer).unwrap();
-    println!("message receive: {}", message);
+        // println!("message length buffer: {:?}", message_length_buffer);
+        // stream.read_to_end(&mut buffer);
+        // println!("debug 2");
+        let message_length = u64::from_be_bytes(message_length_buffer);
+        // println!("Message length: {}", message_length);
+        let mut message_buffer = vec![0u8; message_length as usize];
+        // println!("message buffer: {:?}", message_buffer);
+        // let mut message_buffer = vec![0u8; 17];
+        stream.read_exact(&mut message_buffer)?;
+        // println!("message buffer: {:?}", message_buffer);
+
+        // let message = String::from_utf8_lossy(&buffer).to_string();
+        // let message = String::from_utf8_lossy(&message_buffer).to_string();
+        let message = String::from_utf8(message_buffer).unwrap();
+        println!("message receive: {}", message);
+    // }
 
     Ok(())
 }
+
+// fn check_connection(mut stream: TcpStream) -> Result<()> {
+//     match stream.write(&[0]) {
+//         Ok(_) => true,
+//         Err(e) if e.kind() == ErrorKind::ConnectionReset => {
+//             println!("Connection reset by peer");
+//             false
+//         }
+//         Err(_) => false, // Other errors may also indicate a lost connection
+//     }
+//     Ok(())
+// }

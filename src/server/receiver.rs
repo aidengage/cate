@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::net::{SocketAddrV4, TcpListener, TcpStream};
-use std::thread;
+use std::{fs, thread};
 use std::io::{Read, Write};
 
 use crate::{ADDR, PORT, UPLOAD_DIR};
@@ -85,3 +85,31 @@ fn send_link(mut stream: TcpStream) {
     stream.write_all(&message_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
     stream.write_all(message_back.as_bytes()).expect("could not send file");
 }
+
+fn get_file_name(file_path: &String) -> String {
+    let mut reverse_file_name = String::new();
+
+    let reverse_path = file_path.chars().rev().collect::<String>();
+    for c in reverse_path.chars() {
+        if c != '/' {
+            reverse_file_name.push(c);
+        } else {
+            break;
+        }
+    }
+    let file_name = reverse_file_name.chars().rev().collect::<String>();
+    file_name
+}
+
+// fn generate_link() {
+//     let paths = fs::read_dir(UPLOAD_DIR);
+//     for path in paths {
+//         let directory = path?.path().display().to_string();
+//         let file_name = get_file_name(&directory);
+//         if file_name.as_bytes()[0] as char != '.' {
+//
+//         }
+//     }
+//
+//     // Ok(())
+// }
