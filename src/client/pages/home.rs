@@ -153,27 +153,27 @@ impl HomePage {
         let container = Box::new(Orientation::Vertical, 0);
         let nav_bar = Box::new(Orientation::Horizontal, 0);
 
-        let button_to_page2 = Button::new();
-        let button_right = Button::new();
+        let button_settings = Button::new();
+        let button_files = Button::new();
 
-        button_to_page2.add_css_class("custom-button");
-        button_right.add_css_class("custom-button");
+        button_settings.add_css_class("custom-button");
+        button_files.add_css_class("custom-button");
 
         // container.set_width_request(100);
         // container.set_halign(Align::Center);
-        button_to_page2.set_size_request(10, 10);
-        button_to_page2.set_hexpand(false); // Disable horizontal expansion
-        button_to_page2.set_vexpand(false); // Disable vertical expansion
+        button_settings.set_size_request(10, 10);
+        button_settings.set_hexpand(false); // Disable horizontal expansion
+        button_settings.set_vexpand(false); // Disable vertical expansion
 
-        button_to_page2.set_halign(gtk::Align::Start); // or Center, End depending on where you want it
-        button_to_page2.set_valign(gtk::Align::Center);
+        button_settings.set_halign(Align::Start); // or Center, End depending on where you want it
+        button_settings.set_valign(Align::Center);
 
-        button_right.set_size_request(10, 10);
-        button_right.set_hexpand(false); // Disable horizontal expansion
-        button_right.set_vexpand(false); // Disable vertical expansion
+        button_files.set_size_request(10, 10);
+        button_files.set_hexpand(false); // Disable horizontal expansion
+        button_files.set_vexpand(false); // Disable vertical expansion
 
-        button_right.set_halign(gtk::Align::End); // or Center, End depending on where you want it
-        button_right.set_valign(gtk::Align::Center);
+        button_files.set_halign(Align::End); // or Center, End depending on where you want it
+        button_files.set_valign(Align::Center);
 
         // nav_bar.set_width_request(180);
         nav_bar.set_halign(Align::Center);
@@ -193,9 +193,8 @@ impl HomePage {
 
 
         container.append(&button_text);
-        // button_to_page2.set_child(Some(&container));
-        nav_bar.append(&button_to_page2);
-        nav_bar.append(&button_right);
+        nav_bar.append(&button_settings);
+        nav_bar.append(&button_files);
 
         // let stack_clone = self::page_stack.clone();
         // button_to_page2.connect_clicked(move |_| {

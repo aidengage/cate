@@ -138,7 +138,9 @@ pub fn send_file() -> Result<()> {
 
                         vec_to_discard(message, name_of_file.clone());
                         remove_file(full_path.to_string());
-                        receive_link(stream).expect("Failed to receive link");
+                        receive_link(stream);
+                        // let link = receive_link(stream).0;//.expect("Failed to receive link");
+                        // println!("Received link: {}", link);
                     }
                 }
             } else {
@@ -153,34 +155,39 @@ pub fn send_file() -> Result<()> {
 //     receive from server     //
 /////////////////////////////////
 
-fn receive_link(mut stream: TcpStream) -> Result<()> {
+fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     // if check_connection(stream) {
 
-        // if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
-        println!("connected back to server after send");
-        let mut message_length_buffer = [0u8; 8];
-        // println!("message length buffer: {:?}", message_length_buffer);
-        // println!("debug 1");
-        stream.read_exact(&mut message_length_buffer)?;
+    // println!("connected back to server after send");
+    let mut message_length_buffer = [0u8; 8];
+    // println!("message length buffer: {:?}", message_length_buffer);
+    // println!("debug 1");
+    stream.read_exact(&mut message_length_buffer).expect("length issue");
 
-        // println!("message length buffer: {:?}", message_length_buffer);
-        // stream.read_to_end(&mut buffer);
-        // println!("debug 2");
-        let message_length = u64::from_be_bytes(message_length_buffer);
-        // println!("Message length: {}", message_length);
-        let mut message_buffer = vec![0u8; message_length as usize];
-        // println!("message buffer: {:?}", message_buffer);
-        // let mut message_buffer = vec![0u8; 17];
-        stream.read_exact(&mut message_buffer)?;
-        // println!("message buffer: {:?}", message_buffer);
+    // println!("message length buffer: {:?}", message_length_buffer);
+    // stream.read_to_end(&mut buffer);
+    // println!("debug 2");
+    let message_length = u64::from_be_bytes(message_length_buffer);
+    // println!("Message length: {}", message_length);
+    let mut message_buffer = vec![0u8; message_length as usize];
+    // println!("message buffer: {:?}", message_buffer);
+    // let mut message_buffer = vec![0u8; 17];
+    stream.read_exact(&mut message_buffer).expect("link issue");
+    // println!("message buffer: {:?}", message_buffer);
 
-        // let message = String::from_utf8_lossy(&buffer).to_string();
-        // let message = String::from_utf8_lossy(&message_buffer).to_string();
-        let message = String::from_utf8(message_buffer).unwrap();
-        println!("message receive: {}", message);
-    // }
+    // let message = String::from_utf8_lossy(&buffer).to_string();
+    // let message = String::from_utf8_lossy(&message_buffer).to_string();
+    let message = String::from_utf8(message_buffer).unwrap();
+    println!("link? {}", message);
+    let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
+    file.write(message.as_bytes()).unwrap();
+    // let mut link_file = File::open("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
+    // link_file.write(message.as_bytes()).unwrap();
 
-    Ok(())
+
+
+    // println!("message receive: {}", message);
+    /*(message, Ok(()))*/
 }
 
 // fn check_connection(mut stream: TcpStream) -> Result<()> {

@@ -3,7 +3,7 @@ use std::net::{SocketAddrV4, TcpListener, TcpStream};
 use std::{fs, thread};
 use std::io::{Read, Write};
 
-use crate::{ADDR, PORT, UPLOAD_DIR};
+use crate::{ADDR, PORT, UPLOAD_DIR, PUB_ADDR};
 
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
@@ -116,7 +116,7 @@ fn generate_link(file_name: String) -> String {
     //     }
     // }
 
-    let link = ADDR.to_string() + "/files/" + file_name.as_str();
+    let link = PUB_ADDR.to_string() + "/files/" + file_name.as_str();
     println!("link: {}", link);
     link
     // Ok(())
