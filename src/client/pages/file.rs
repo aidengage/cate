@@ -30,6 +30,7 @@ impl FilePage {
         let scrollable_window = ScrolledWindow::builder()
             .hscrollbar_policy(PolicyType::Never)
             .min_content_width(300)
+            .min_content_height(100)
             .child(&list_box)
             .build();
 
