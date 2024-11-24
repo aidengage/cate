@@ -1,13 +1,17 @@
 use std::{fs, io};
+use std::error::Error;
 use std::fs::File;
 use std::fs::metadata;
-use std::io::{Read, Write};
+use std::io::{BufWriter, Read, Write};
 use std::net::SocketAddrV4;
 use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 use std::io::Result;
 use std::io::ErrorKind;
+
+use std::io::LineWriter;
+use std::fs::OpenOptions;
 
 use gtk::prelude::*;
 
@@ -157,7 +161,7 @@ pub fn send_file() -> Result<()> {
 
 fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     // if check_connection(stream) {
-
+    // println!("in receive link method");
     // println!("connected back to server after send");
     let mut message_length_buffer = [0u8; 8];
     // println!("message length buffer: {:?}", message_length_buffer);
@@ -179,8 +183,23 @@ fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     // let message = String::from_utf8_lossy(&message_buffer).to_string();
     let message = String::from_utf8(message_buffer).unwrap();
     println!("link? {}", message);
-    let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
-    file.write(message.as_bytes()).unwrap();
+    // let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
+    // file.write(message.as_bytes()).unwrap();
+    append_file("/Users/aidengage/dev/senior/cate/assets/links.txt", message.as_str()).expect("failed to write to file");
+
+    // line writer
+    // let mut line_writer = LineWriter::new(file);
+    // line_writer.write_all(&message.as_bytes()).unwrap();
+    // line_writer.flush().unwrap();
+
+    // open options
+    // let mut append_file = OpenOptions::new()
+    //     .create(true)
+    //     .append(true)
+    //     .open("/Users/aidengage/dev/senior/cate/assets/links.txt");
+    // let writer = BufWriter::new(append_file);
+    // writeln!(writer, "{}", message.as_str()).expect("message not written");
+
     // let mut link_file = File::open("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
     // link_file.write(message.as_bytes()).unwrap();
 
@@ -188,6 +207,18 @@ fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
 
     // println!("message receive: {}", message);
     /*(message, Ok(()))*/
+}
+
+fn append_file(file_path: &str, content: &str) -> Result<()> {
+    println!("content: {}", content);
+    // open options
+    let append_file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(file_path)?;
+    let mut writer = BufWriter::new(append_file);
+    writeln!(writer, "{}", content).expect("message not written");
+    Ok(())
 }
 
 // fn check_connection(mut stream: TcpStream) -> Result<()> {
