@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use gtk::prelude::*;
 use gtk::{gdk, DropTarget, Label, Stack, Button, Box, Orientation, CssProvider, Align, Justification, Overlay};
-
+use crate::pages::file::FilePage;
 use crate::sender;
 
 pub struct HomePage {
@@ -85,23 +85,6 @@ impl HomePage {
         button_files.connect_clicked(move |_| {
             stack_file.set_visible_child_name("file-page");
         });
-
-
-        let fixed = gtk::Fixed::new();
-        let grid = gtk::Grid::new();
-
-
-        let provider = CssProvider::new();
-
-        // button_to_page2.set_hexpand(true);
-
-
-
-        // button_to_page2.set_size_request(100, 50);
-        // fixed.set_size_request(100, 100);
-
-        // fixed.put(&button_to_page2, 0f64, 0f64);
-        // grid.attach(&button_to_page2, 0, 0, 1, 1);
 
         let label = Label::builder()
             .label("CARBON")
@@ -195,11 +178,6 @@ impl HomePage {
         container.append(&button_text);
         nav_bar.append(&button_settings);
         nav_bar.append(&button_files);
-
-        // let stack_clone = self::page_stack.clone();
-        // button_to_page2.connect_clicked(move |_| {
-        //     stack_clone.set_visible_child_name("file-page");
-        // });
 
         nav_bar
     }

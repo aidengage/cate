@@ -1,74 +1,31 @@
 use gtk::prelude::*;
-use gtk::{Label, Stack, Button, Box, Orientation, ListBox, ScrolledWindow, PolicyType, gdk, GestureClick};
+use gtk::{Label, Stack, Button, Box, Orientation, ListBox, ScrolledWindow, PolicyType, gdk, GestureClick, glib};
 use gdk::Clipboard;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::ptr::copy;
+use std::fs::{File, OpenOptions};
+use std::io::{BufRead, BufReader, Write};
+use std::time::Duration;
+use glib::ControlFlow;
 
 pub struct FilePage {
     pub vbox_files: Box,
     pub container: Box,
     pub list_box: ListBox,
+    file_path: String,
 }
 
 impl FilePage {
     pub fn new(page_stack: &Stack) -> Self {
-
         let vbox_files = Box::new(Orientation::Vertical, 0);
         let container = Box::new(Orientation::Vertical, 0);
-
-
-
         let list_box = ListBox::new();
-        let file = File::open("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
-        let reader = BufReader::new(file);
-        // let copy_button = Button::new();
 
-        for lines in reader.lines() {
-            // copy_button.set_tooltip_text(Some("Copy file"));
+        let file_path = String::from("/Users/aidengage/dev/senior/cate/assets/links.txt");
 
-            // let copy_container = Box::new(Orientation::Vertical, 2);
-            let label = Label::new(Some(lines.unwrap().as_ref()));
-            // label.set_use_markup(true);
-            label.set_selectable(false);
-            label.set_can_target(true);
-            label.set_widget_name("clickable-label");
-
-            let clipboard = gdk::Display::default()
-                .expect("could not get default display")
-                .clipboard();
-
-            let gesture = GestureClick::new();
-            let label_clone = label.clone();
-            gesture.connect_released(move |_, _, _, _| {
-                clipboard.set_text(label_clone.text().as_str());
-            });
-            label.add_controller(gesture);
-
-            // label.connect_activate_link(move |label, _uri| {
-            //     let text = label.text();
-            //     clipboard.set_text(&text);
-            //     println!("text: {}", text);
-            //     gtk::glib::Propagation::Stop
-            // });
-
-
-            // copy_button.set_tooltip_text(Some(&label.));
-            // copy_button.add_css_class("custom-button");
-
-            // copy_container.append(&label);
-
-            label.add_css_class("button-text");
-            // list_box.append(&label);
-            // list_box.append(&copy_to_clipboard);
-            // list_box.append(&copy_button);
-            // copy_button.set_child(Some(&copy_container));
-            list_box.append(&label);
-        }
-        // copy_button.connect_
-        // copy_button.connect_clicked(move |_| {
-        //     Clipboard::
-        // })
+        // Initial load of links
+        // if let Ok(file) = File::open(&file_path) {
+        //     let reader = BufReader::new(file);
+        //     FilePage::populate_list_box(&list_box, reader);
+        // }
 
         let scrollable_window = ScrolledWindow::builder()
             .hscrollbar_policy(PolicyType::Never)
@@ -76,19 +33,16 @@ impl FilePage {
             .child(&list_box)
             .build();
 
-
-
-
-
-
         let button_back_home = Button::new();
-
         button_back_home.add_css_class("custom-button");
 
         let button_text_page2 = Label::builder()
             .label("back to home page")
+            // .margin_top(0)
+            // .margin_bottom(0)
+            // .margin_start(0)
+            // .margin_end(0)
             .build();
-
         button_text_page2.add_css_class("button-text");
 
         let label_page2 = Label::builder()
@@ -112,15 +66,64 @@ impl FilePage {
         });
         button_back_home.add_css_class("custom-button");
 
-        Self { vbox_files, container, list_box }
+        let file_page = Self { vbox_files, container, list_box, file_path, };
+        // refresh_links.connect_clicked(file_page.refresh_links());
+        // file_page.refresh_links();
+        file_page.setup_auto_refresh();
+        file_page
     }
 
-    // Add page-specific methods here
-    // pub fn get_entry_text(&self) -> String {
-    //     self.entry.text().to_string()
-    // }
+    fn setup_auto_refresh(&self) {
+        let list_box = self.list_box.clone();
+        let file_path = self.file_path.clone();
 
-    pub fn process_links(&self) {
+        // Refresh every 1000ms (1 second) - adjust this value as needed
+        glib::timeout_add_local(Duration::from_millis(1000), move || {
+            if let Ok(file) = File::open(&file_path) {
+                let reader = BufReader::new(file);
+                FilePage::populate_list_box(&list_box, reader);
+            }
+            // Continue the timeout
+            ControlFlow::Continue
+        });
 
+    }
+
+    // Helper function to create a label with clipboard functionality
+    fn create_link_label(text: &str) -> Label {
+        let label = Label::new(Some(text));
+        label.set_selectable(false);
+        label.set_can_target(true);
+        label.set_widget_name("clickable-label");
+
+        let clipboard = gdk::Display::default()
+            .expect("could not get default display")
+            .clipboard();
+
+        let gesture = GestureClick::new();
+        let label_clone = label.clone();
+        gesture.connect_released(move |_, _, _, _| {
+            clipboard.set_text(label_clone.text().as_str());
+        });
+        label.add_controller(gesture);
+        label.add_css_class("button-text");
+
+        label
+    }
+
+    // Helper function to populate the list box
+    fn populate_list_box(list_box: &ListBox, reader: BufReader<File>) {
+        // Clear existing items
+        while let Some(child) = list_box.first_child() {
+            list_box.remove(&child);
+        }
+
+        // Add new items
+        for line in reader.lines() {
+            if let Ok(text) = line {
+                let label = FilePage::create_link_label(&text);
+                list_box.append(&label);
+            }
+        }
     }
 }
