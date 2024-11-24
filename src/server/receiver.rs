@@ -79,12 +79,6 @@ pub fn handle_client(mut stream: TcpStream) {
 ///////////////////////////////////
 
 fn send_link(mut stream: TcpStream, link: String) {
-    // let message_back = "hello from server this is pain";
-    // let message_length = message_back.len() as u64;
-    // println!("message length: {:?}", message_length.to_be_bytes());
-    // println!("message: {:?}", message_back);
-    // stream.write_all(&message_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
-    // stream.write_all(message_back.as_bytes()).expect("could not send file");
     let link_length = link.len() as u64;
     println!("message: {:?}", link);
     stream.write_all(&link_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
