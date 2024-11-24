@@ -9,7 +9,7 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
         return;
     } else {
-        let mut file = File::create(UPLOAD_DIR.to_string() + file_name.as_str()).unwrap();
+        let mut file = File::create(UPLOAD_DIR.to_string() + remove_spaces(file_name).as_str()).unwrap();
         file.write_all(&vec).unwrap();
     }
 }
@@ -106,6 +106,20 @@ fn get_file_name(file_path: &String) -> String {
     file_name
 }
 
+fn remove_spaces(file_name: String) -> String {
+    let mut processed_string = String::new();
+
+    for char in file_name.chars() {
+        if char == ' ' {
+            processed_string.push('_');
+        } else {
+            processed_string.push(char);
+        }
+    }
+
+    processed_string
+}
+
 fn generate_link(file_name: String) -> String {
     // let paths = fs::read_dir(UPLOAD_DIR);
     // for path in paths {
@@ -115,8 +129,9 @@ fn generate_link(file_name: String) -> String {
     //
     //     }
     // }
+    let processed_name = remove_spaces(file_name);
 
-    let link = PUB_ADDR.to_string() + "/files/" + file_name.as_str();
+    let link = PUB_ADDR.to_string() + "/files/" + processed_name.as_str();
     println!("link: {}", link);
     link
     // Ok(())
