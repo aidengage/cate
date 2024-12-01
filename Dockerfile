@@ -11,7 +11,7 @@ EXPOSE 80
 
 WORKDIR /usr/src/app/
 
-COPY . ./
+COPY src/client ./
 
 RUN cargo build --features server-binary --bin server --release
 
