@@ -15,7 +15,7 @@ use std::fs::OpenOptions;
 
 use gtk::prelude::*;
 
-use crate::{PULL_DIR, PUSH_DIR, ADDR, PORT};
+use crate::{PULL_DIR, PUSH_DIR, ADDR, PORT, LINK_FILE, USER_DOMAIN};
 
 // static ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
 // static PULL_DIR: &str = Path::new(&ROOT_DIR).join("pull").to_str().unwrap();
@@ -185,6 +185,19 @@ pub fn send_file() -> Result<()> {
 //     receive from server     //
 /////////////////////////////////
 
+// fn replace_ip_domain(link: String, domain: String) {
+//     let mut reverse_link = String::new();
+//
+//     let reverse_link = link.chars().rev().collect::<String>();
+//     for c in reverse_link.chars() {
+//         if c != '/' {
+//             // reverse_link.push(c);
+//         } else {
+//             break;
+//         }
+//     }
+// }
+
 fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     // if check_connection(stream) {
     // println!("in receive link method");
@@ -211,7 +224,8 @@ fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     println!("link? {}", message);
     // let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
     // file.write(message.as_bytes()).unwrap();
-    append_file("/Users/aidengage/dev/senior/cate/assets/links.txt", message.as_str()).expect("failed to write to file");
+    // append_file("/Users/aidengage/dev/senior/cate/assets/links.txt", message.as_str()).expect("failed to write to file");
+    append_file(LINK_FILE.to_string(), message.as_str()).expect("failed to write to file");
     // append_file("../../../assets/links.txt", message.as_str()).expect("failed to write to file");
 
     // line writer
@@ -236,7 +250,7 @@ fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     /*(message, Ok(()))*/
 }
 
-fn append_file(file_path: &str, content: &str) -> Result<()> {
+fn append_file(file_path: String, content: &str) -> Result<()> {
     // println!("content: {}", content);
     // open options
     let append_file = OpenOptions::new()

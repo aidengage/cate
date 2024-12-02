@@ -5,7 +5,7 @@ use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::time::Duration;
 use glib::ControlFlow;
-use crate::LINK_DIR;
+use crate::LINK_FILE;
 
 pub struct FilePage {
     pub vbox_files: Box,
@@ -19,14 +19,6 @@ impl FilePage {
         let container = Box::new(Orientation::Vertical, 0);
         let list_box = ListBox::new();
 
-        // let file_path = String::from("/Users/aidengage/dev/senior/cate/assets/links.txt");
-
-        // Initial load of links
-        // if let Ok(file) = File::open(&file_path) {
-        //     let reader = BufReader::new(file);
-        //     FilePage::populate_list_box(&list_box, reader);
-        // }
-
         let scrollable_window = ScrolledWindow::builder()
             .hscrollbar_policy(PolicyType::Never)
             .min_content_width(300)
@@ -39,10 +31,6 @@ impl FilePage {
 
         let button_text_page2 = Label::builder()
             .label("back to home page")
-            // .margin_top(0)
-            // .margin_bottom(0)
-            // .margin_start(0)
-            // .margin_end(0)
             .build();
         button_text_page2.add_css_class("button-text");
 
@@ -76,7 +64,7 @@ impl FilePage {
 
     fn setup_auto_refresh(&self) {
         let list_box = self.list_box.clone();
-        let file_path = &*LINK_DIR;
+        let file_path = &*LINK_FILE;
 
         // Refresh every 1000ms (1 second) - adjust this value as needed
         glib::timeout_add_local(Duration::from_millis(1000), move || {

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use gtk::prelude::*;
 use gtk::{gdk, DropTarget, Label, Stack, Button, Box, Orientation, CssProvider, Align, Justification, Overlay};
 use crate::pages::file::FilePage;
-use crate::sender;
+use crate::{sender, USER_DOMAIN};
 
 pub struct HomePage {
     pub vbox_home: Box,
@@ -25,6 +25,9 @@ impl HomePage {
 
         let button_settings = Button::new();
         let button_files = Button::new();
+        let button_domain = Button::builder()
+            .label("Domain")
+            .build();
 
         let settings_icon = gtk::Image::from_file("assets/settings.png");
         settings_icon.add_css_class("nav-icon");
@@ -50,7 +53,7 @@ impl HomePage {
         button_files.set_hexpand(false); // Disable horizontal expansion
         button_files.set_vexpand(false); // Disable vertical expansion
 
-        button_files.set_halign(Align::End); // or Center, End depending on where you want it
+        button_files.set_halign(Align::Start); // or Center, End depending on where you want it
         button_files.set_valign(Align::Center);
 
         // nav_bar.set_width_request(180);
@@ -127,7 +130,16 @@ impl HomePage {
             true
         });
 
+        // debug button to print domain name from setting page
+        button_domain.connect_clicked(move |_| {
+            let mut domain = USER_DOMAIN.lock().unwrap();
+            // println!("domain: {:?}", *USER_DOMAIN);
+            println!("domain: {}", *domain);
+        });
+        button_domain.add_css_class("custom-button");
+
         vbox_home.add_controller(drop);
+        vbox_home.append(&button_domain);
 
         Self { vbox_home, container, overlay }
     }
