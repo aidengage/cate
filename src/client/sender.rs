@@ -15,7 +15,7 @@ use std::fs::OpenOptions;
 
 use gtk::prelude::*;
 
-use crate::{ROOT_DIR, PULL_DIR, PUSH_DIR, ADDR, PORT};
+use crate::{PULL_DIR, PUSH_DIR, ADDR, PORT};
 
 // static ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
 // static PULL_DIR: &str = Path::new(&ROOT_DIR).join("pull").to_str().unwrap();

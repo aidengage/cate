@@ -5,12 +5,12 @@ use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::time::Duration;
 use glib::ControlFlow;
+use crate::LINK_DIR;
 
 pub struct FilePage {
     pub vbox_files: Box,
     pub container: Box,
     pub list_box: ListBox,
-    file_path: String,
 }
 
 impl FilePage {
@@ -19,7 +19,7 @@ impl FilePage {
         let container = Box::new(Orientation::Vertical, 0);
         let list_box = ListBox::new();
 
-        let file_path = String::from("/Users/aidengage/dev/senior/cate/assets/links.txt");
+        // let file_path = String::from("/Users/aidengage/dev/senior/cate/assets/links.txt");
 
         // Initial load of links
         // if let Ok(file) = File::open(&file_path) {
@@ -34,8 +34,8 @@ impl FilePage {
             .child(&list_box)
             .build();
 
-        let button_back_home = Button::new();
-        button_back_home.add_css_class("custom-button");
+        let button_home = Button::new();
+        button_home.add_css_class("custom-button");
 
         let button_text_page2 = Label::builder()
             .label("back to home page")
@@ -56,18 +56,18 @@ impl FilePage {
 
         vbox_files.append(&label_page2);
         vbox_files.append(&scrollable_window);
-        vbox_files.append(&button_back_home);
+        vbox_files.append(&button_home);
 
         container.append(&button_text_page2);
-        button_back_home.set_child(Some(&container));
+        button_home.set_child(Some(&container));
 
         let stack_clone = page_stack.clone();
-        button_back_home.connect_clicked(move |_| {
+        button_home.connect_clicked(move |_| {
             stack_clone.set_visible_child_name("home-page")
         });
-        button_back_home.add_css_class("custom-button");
+        button_home.add_css_class("custom-button");
 
-        let file_page = Self { vbox_files, container, list_box, file_path, };
+        let file_page = Self { vbox_files, container, list_box };
         // refresh_links.connect_clicked(file_page.refresh_links());
         // file_page.refresh_links();
         file_page.setup_auto_refresh();
@@ -76,7 +76,7 @@ impl FilePage {
 
     fn setup_auto_refresh(&self) {
         let list_box = self.list_box.clone();
-        let file_path = self.file_path.clone();
+        let file_path = &*LINK_DIR;
 
         // Refresh every 1000ms (1 second) - adjust this value as needed
         glib::timeout_add_local(Duration::from_millis(1000), move || {

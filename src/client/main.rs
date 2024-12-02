@@ -17,6 +17,7 @@ lazy_static! {
     static ref ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
     static ref PULL_DIR: String = Path::new(&*ROOT_DIR).join("pull/").to_str().unwrap().to_string();
     static ref PUSH_DIR: String = Path::new(&*ROOT_DIR).join("push/").to_str().unwrap().to_string();
+    static ref LINK_DIR: String = Path::new(&*ROOT_DIR).join("assets/links.txt").to_str().unwrap().to_string();
 }
 
 // const ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
