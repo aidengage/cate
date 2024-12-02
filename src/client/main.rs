@@ -8,8 +8,27 @@ use gdk::Display;
 use gtk::prelude::*;
 use gtk::{gdk, Application, ApplicationWindow, CssProvider, Stack, Box, StackSwitcher, Orientation};
 
-const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
-const DISCARD: &str = "/Users/aidengage/dev/senior/cate/push/";
+use std::env;
+use std::path::{Path, PathBuf};
+use std::string::ToString;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
+    static ref PULL_DIR: String = Path::new(&*ROOT_DIR).join("pull/").to_str().unwrap().to_string();
+    static ref PUSH_DIR: String = Path::new(&*ROOT_DIR).join("push/").to_str().unwrap().to_string();
+}
+
+// const ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
+// const PULL_DIR: &str = Path::new(&ROOT_DIR).join("pull").to_str().unwrap();
+// const PUSH_DIR: &str = Path::new(&ROOT_DIR).join("push").to_str().unwrap();
+
+// const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
+// const PULL_DIR: String = ROOT_DIR + "pull";
+
+// const PUSH_DIR: &str = "/Users/aidengage/dev/senior/cate/push/";
+// const PUSH_DIR: String = ROOT_DIR + "push";
+
 const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(172, 17, 0, 2);
 // docker localhost address, dont need to specify here, keep 127, 0, 0, 1

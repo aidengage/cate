@@ -1,4 +1,4 @@
-use std::{fs, io};
+use std::{env, fs, io};
 use std::error::Error;
 use std::fs::File;
 use std::fs::metadata;
@@ -15,7 +15,11 @@ use std::fs::OpenOptions;
 
 use gtk::prelude::*;
 
-use crate::{PULL_DIR, DISCARD, ADDR, PORT};
+use crate::{ROOT_DIR, PULL_DIR, PUSH_DIR, ADDR, PORT};
+
+// static ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
+// static PULL_DIR: &str = Path::new(&ROOT_DIR).join("pull").to_str().unwrap();
+// static PUSH_DIR: &str = Path::new(&ROOT_DIR).join("push").to_str().unwrap();
 
 fn check_file(file_path: &str) -> bool {
     if let Ok(_file) = File::open(file_path) {
@@ -27,6 +31,7 @@ fn check_file(file_path: &str) -> bool {
 
 fn dir_to_vec(file_path: String) -> Vec<u8> {
     let clean_path: String = file_path.clone().trim().to_string();
+    println!("Cleaning file: {}", clean_path);
     if Path::new(clean_path.as_str()).exists() {
         let file_contents: Vec<u8> = fs::read(clean_path).unwrap();
         file_contents
@@ -36,6 +41,8 @@ fn dir_to_vec(file_path: String) -> Vec<u8> {
 }
 
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
+    println!("in vec_to_file: {}", file_name);
+    println!("PULL_DIR: {}", *PULL_DIR);
     if vec.len() == 0 {
         return;
     } else {
@@ -48,7 +55,8 @@ fn vec_to_discard(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
         return;
     } else {
-        let mut file = File::create(DISCARD.to_string() + file_name.as_str()).unwrap();
+        let mut file = File::create(PUSH_DIR.to_string() + file_name.as_str()).unwrap();
+        // let mut file = File::create(PUSH_DIR.join(file_name.to_string())).unwrap(); // test
         file.write_all(&vec).unwrap();
     }
 }
@@ -74,26 +82,42 @@ fn get_file_name(file_path: &String) -> String {
 
 // hmmmmm
 pub fn move_file(file_path: String) {
-    if check_file(&file_path) {
-        let file_vector = dir_to_vec(file_path.to_string());
-        vec_to_file(file_vector, get_file_name(&file_path));
-    } else {
-        println!("File does not exist");
-    }
+    println!("in move_file: {}", file_path.clone());
+    let file_vector = dir_to_vec(file_path.to_string());
+    vec_to_file(file_vector, get_file_name(&file_path));
+    // println!("checked file {}", check_file(file_path.as_str()));
+    // if check_file(&file_path) {
+    //     let file_vector = dir_to_vec(file_path.to_string());
+    //     vec_to_file(file_vector, get_file_name(&file_path));
+    // } else {
+    //     println!("File does not exist");
+    // }
 }
 
 pub fn send_file() -> Result<()> {
-    println!("Hello Client!");
+    println!("in send_file");
+
+    // let project_root = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
+    // println!("project_root: {}", project_root);
+    // let file_path = Path::new(&project_root).join("assets/links.txt");
+    // println!("file_path: {:?}", file_path);
+
+    // println!("root dir: {}", *ROOT_DIR);
+    // println!("pull dir: {}", *PULL_DIR);
+    // println!("push dir: {}", *PUSH_DIR);
+
     // let mut progress_var = 0;
 
     // let paths = fs::read_dir("/Users/aidengage/dev/senior/cate/file-for-upload/")?;
-    let paths = fs::read_dir(PULL_DIR)?;
+    let paths = fs::read_dir(&*PULL_DIR.as_str())?;
     for path in paths {
         // println!("paths print");
         let directory = path?.path().display().to_string();
+        println!("directory: {}", directory);
         let file_name = get_file_name(&directory);
+        println!("file name: {}", file_name);
         if file_name.as_bytes()[0] as char != '.' {
-            // println!("if char");
+            println!("if char");
             let name_of_file = file_name.clone();
             println!("name of file: {}", name_of_file);
             if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
@@ -101,6 +125,7 @@ pub fn send_file() -> Result<()> {
                 println!("Connected to the server on {:?}", stream.peer_addr()?);
 
                 let full_path = PULL_DIR.to_string() + name_of_file.as_str();
+                // let full_path = PULL_DIR.join(name_of_file.to_string()); // test
 
                 let mut file_size = 0;
                 match metadata(&full_path) {
@@ -126,6 +151,7 @@ pub fn send_file() -> Result<()> {
                 // println!("name vec: {:?}", name_vec);
                 stream.write_all(&name_vec)?;
                 let message = dir_to_vec(full_path.clone());
+                // let message = dir_to_vec(full_path.into_os_string().into_string().unwrap()); // test
 
                 let size_array = file_size.to_be_bytes().to_vec();
 
@@ -186,6 +212,7 @@ fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     // let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
     // file.write(message.as_bytes()).unwrap();
     append_file("/Users/aidengage/dev/senior/cate/assets/links.txt", message.as_str()).expect("failed to write to file");
+    // append_file("../../../assets/links.txt", message.as_str()).expect("failed to write to file");
 
     // line writer
     // let mut line_writer = LineWriter::new(file);
@@ -210,7 +237,7 @@ fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
 }
 
 fn append_file(file_path: &str, content: &str) -> Result<()> {
-    println!("content: {}", content);
+    // println!("content: {}", content);
     // open options
     let append_file = OpenOptions::new()
         .create(true)
