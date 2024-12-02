@@ -29,10 +29,11 @@ lazy_static! {
 // const PUSH_DIR: &str = "/Users/aidengage/dev/senior/cate/push/";
 // const PUSH_DIR: String = ROOT_DIR + "push";
 
-const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
+// const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(172, 17, 0, 2);
-// docker localhost address, dont need to specify here, keep 127, 0, 0, 1
-// const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
+const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
+
+// docker localhost address, dont need to specify here, keep 127, 0, 0, 1 when sending to local docker
 const PORT: u16 = 8000;
 const APP_ID: &str = "com.aidengage.carbon";
 

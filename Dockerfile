@@ -6,7 +6,6 @@ RUN apt-get install apache2 -y
 RUN mkdir /var/www/html/files/
 
 EXPOSE 8000
-EXPOSE 8080
 EXPOSE 80
 
 WORKDIR /usr/src/app/

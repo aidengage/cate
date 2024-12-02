@@ -1,5 +1,5 @@
 use gtk::prelude::*;
-use gtk::{Box, Stack, Orientation, Button};
+use gtk::{Box, Stack, Orientation, Button, Label};
 
 pub struct SettingPage {
     pub vbox_settings: Box,
@@ -18,11 +18,23 @@ impl SettingPage {
         button_home.set_hexpand(false);
         button_home.set_vexpand(false);
 
+        let label_setting = Label::builder()
+            .label("Setting(s)")
+            .margin_top(5)
+            .margin_bottom(10)
+            .margin_start(10)
+            .margin_end(10)
+            .build();
+
+        vbox_settings.append(&label_setting);
+
+
         let stack_clone = page_stack.clone();
         button_home.connect_clicked(move |_| {
             stack_clone.set_visible_child_name("home-page");
         });
         button_home.add_css_class("custom-button");
+
         vbox_settings.append(&button_home);
 
         Self { vbox_settings, container }

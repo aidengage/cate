@@ -17,9 +17,9 @@ const ADDR: Ipv4Addr = Ipv4Addr::new(172, 17, 0, 2);
 const PORT: u16 = 8000;
 
 fn main () {
-    // if !Uid::effective().is_root() {
-    //     panic!("You must run this executable with root permissions");
-    // } else {
+    if !Uid::effective().is_root() {
+        panic!("You must run this executable with root permissions");
+    } else {
         receiver::receive_file();
-    // }
+    }
 }

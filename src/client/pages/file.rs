@@ -48,7 +48,7 @@ impl FilePage {
 
         let label_page2 = Label::builder()
             .label("File(s)")
-            .margin_top(10)
+            .margin_top(5)
             .margin_bottom(10)
             .margin_start(10)
             .margin_end(10)
