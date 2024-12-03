@@ -70,7 +70,6 @@ pub fn handle_client(mut stream: TcpStream) {
 
     vec_to_file(buffer, file_name.to_string());
     let tcp_clone = stream.try_clone().unwrap();
-    // let link = generate_link(file_name);
     let link = generate_half_link(file_name);
     send_link(tcp_clone, link);
 }
@@ -116,14 +115,6 @@ fn remove_spaces(file_name: String) -> String {
 }
 
 fn generate_link(file_name: String) -> String {
-    // let paths = fs::read_dir(UPLOAD_DIR);
-    // for path in paths {
-    //     let directory = path?.path().display().to_string();
-    //     let file_name = get_file_name(&directory);
-    //     if file_name.as_bytes()[0] as char != '.' {
-    //
-    //     }
-    // }
     let processed_name = remove_spaces(file_name);
 
     let link = PUB_ADDR.to_string() + "/files/" + processed_name.as_str();

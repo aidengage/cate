@@ -1,5 +1,4 @@
 use std::{env, fs, io};
-use std::error::Error;
 use std::fs::File;
 use std::fs::metadata;
 use std::io::{BufWriter, Read, Write};
@@ -8,19 +7,11 @@ use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 use std::io::Result;
-use std::io::ErrorKind;
-
-use std::io::LineWriter;
 use std::fs::OpenOptions;
 
 use gtk::prelude::*;
 
 use crate::{PULL_DIR, PUSH_DIR, ADDR, PORT, LINK_FILE, USER_DOMAIN};
-
-// static ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
-// static PULL_DIR: &str = Path::new(&ROOT_DIR).join("pull").to_str().unwrap();
-// static PUSH_DIR: &str = Path::new(&ROOT_DIR).join("push").to_str().unwrap();
-
 fn check_file(file_path: &str) -> bool {
     if let Ok(_file) = File::open(file_path) {
         true
@@ -62,6 +53,18 @@ fn vec_to_discard(vec: Vec<u8>, file_name: String) {
     }
 }
 
+fn remove_spaces(file_name: String) -> String {
+    let mut processed_string = String::new();
+
+    for char in file_name.chars() {
+        if char != ' ' {
+            processed_string.push(char);
+        }
+    }
+
+    processed_string
+}
+
 fn remove_file(file_path: String) {
     fs::remove_file(file_path).unwrap();
 }
@@ -86,58 +89,29 @@ pub fn move_file(file_path: String) {
     println!("in move_file: {}", file_path.clone());
     let file_vector = dir_to_vec(file_path.to_string());
     vec_to_file(file_vector, get_file_name(&file_path));
-    // println!("checked file {}", check_file(file_path.as_str()));
-    // if check_file(&file_path) {
-    //     let file_vector = dir_to_vec(file_path.to_string());
-    //     vec_to_file(file_vector, get_file_name(&file_path));
-    // } else {
-    //     println!("File does not exist");
-    // }
 }
 
 pub fn send_file() -> Result<()> {
     println!("in send_file");
 
-    // let project_root = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
-    // println!("project_root: {}", project_root);
-    // let file_path = Path::new(&project_root).join("assets/links.txt");
-    // println!("file_path: {:?}", file_path);
-
-    // println!("root dir: {}", *ROOT_DIR);
-    // println!("pull dir: {}", *PULL_DIR);
-    // println!("push dir: {}", *PUSH_DIR);
-
-    // let mut progress_var = 0;
-
-    // let paths = fs::read_dir("/Users/aidengage/dev/senior/cate/file-for-upload/")?;
     let paths = fs::read_dir(&*PULL_DIR.as_str())?;
     for path in paths {
-        // println!("paths print");
         let directory = path?.path().display().to_string();
-        println!("directory: {}", directory);
+        // println!("directory: {}", directory);
         let file_name = get_file_name(&directory);
-        println!("file name: {}", file_name);
+        // println!("file name: {}", file_name);
         if file_name.as_bytes()[0] as char != '.' {
-            println!("if char");
             let name_of_file = file_name.clone();
-            println!("name of file: {}", name_of_file);
+            // println!("name of file: {}", name_of_file);
             if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
-                println!("if connect");
                 println!("Connected to the server on {:?}", stream.peer_addr()?);
 
                 let full_path = PULL_DIR.to_string() + name_of_file.as_str();
-                // let full_path = PULL_DIR.join(name_of_file.to_string()); // test
 
                 let mut file_size = 0;
                 match metadata(&full_path) {
                     Ok(metadata) => {
                         file_size = metadata.len();
-                        // if file_size > isize::MAX as u64 {
-                        //     println!("one of your files is too large (over {})", isize::MAX as u64);
-                        //     // shutdown causes issue when sending nothing
-                        //     stream.shutdown(Shutdown::Both).expect("shutdown call failed");
-                        //     continue;
-                        // }
                         println!("File size: {}", file_size);
                     }
                     Err(error) => {
@@ -170,8 +144,6 @@ pub fn send_file() -> Result<()> {
                         vec_to_discard(message, name_of_file.clone());
                         remove_file(full_path.to_string());
                         receive_link(stream);
-                        // let link = receive_link(stream).0;//.expect("Failed to receive link");
-                        // println!("Received link: {}", link);
                     }
                 }
             } else {
@@ -186,73 +158,22 @@ pub fn send_file() -> Result<()> {
 //     receive from server     //
 /////////////////////////////////
 
-// fn replace_ip_domain(link: String, domain: String) {
-//     let mut reverse_link = String::new();
-//
-//     let reverse_link = link.chars().rev().collect::<String>();
-//     for c in reverse_link.chars() {
-//         if c != '/' {
-//             // reverse_link.push(c);
-//         } else {
-//             break;
-//         }
-//     }
-// }
-
-fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
-    // if check_connection(stream) {
-    // println!("in receive link method");
-    // println!("connected back to server after send");
+fn receive_link(mut stream: TcpStream) {
     let mut message_length_buffer = [0u8; 8];
-    // println!("message length buffer: {:?}", message_length_buffer);
-    // println!("debug 1");
     stream.read_exact(&mut message_length_buffer).expect("length issue");
 
-    // println!("message length buffer: {:?}", message_length_buffer);
-    // stream.read_to_end(&mut buffer);
-    // println!("debug 2");
     let message_length = u64::from_be_bytes(message_length_buffer);
-    // println!("Message length: {}", message_length);
     let mut message_buffer = vec![0u8; message_length as usize];
-    // println!("message buffer: {:?}", message_buffer);
-    // let mut message_buffer = vec![0u8; 17];
     stream.read_exact(&mut message_buffer).expect("link issue");
-    // println!("message buffer: {:?}", message_buffer);
 
-    // let message = String::from_utf8_lossy(&buffer).to_string();
-    // let message = String::from_utf8_lossy(&message_buffer).to_string();
     let message = String::from_utf8(message_buffer).unwrap();
     println!("link? {}", message);
-    // let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
-    // file.write(message.as_bytes()).unwrap();
     let extracted_domain = USER_DOMAIN.lock().unwrap();
     println!("extracted: {:?}", extracted_domain);
-    let domain = extracted_domain.clone();
+    let domain = remove_spaces(extracted_domain.clone());
     println!("domain: {}", domain);
     let link = create_link(domain, message);
     append_file(LINK_FILE.to_string(), link.as_str()).expect("failed to write to file");
-    // append_file("../../../assets/links.txt", message.as_str()).expect("failed to write to file");
-
-    // line writer
-    // let mut line_writer = LineWriter::new(file);
-    // line_writer.write_all(&message.as_bytes()).unwrap();
-    // line_writer.flush().unwrap();
-
-    // open options
-    // let mut append_file = OpenOptions::new()
-    //     .create(true)
-    //     .append(true)
-    //     .open("/Users/aidengage/dev/senior/cate/assets/links.txt");
-    // let writer = BufWriter::new(append_file);
-    // writeln!(writer, "{}", message.as_str()).expect("message not written");
-
-    // let mut link_file = File::open("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
-    // link_file.write(message.as_bytes()).unwrap();
-
-
-
-    // println!("message receive: {}", message);
-    /*(message, Ok(()))*/
 }
 
 fn append_file(file_path: String, content: &str) -> Result<()> {
@@ -279,15 +200,3 @@ fn create_link(domain: String, cat_link: String) -> String {
     println!("created link: {}", link);
     link
 }
-
-// fn check_connection(mut stream: TcpStream) -> Result<()> {
-//     match stream.write(&[0]) {
-//         Ok(_) => true,
-//         Err(e) if e.kind() == ErrorKind::ConnectionReset => {
-//             println!("Connection reset by peer");
-//             false
-//         }
-//         Err(_) => false, // Other errors may also indicate a lost connection
-//     }
-//     Ok(())
-// }

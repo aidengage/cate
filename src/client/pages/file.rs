@@ -56,8 +56,6 @@ impl FilePage {
         button_home.add_css_class("custom-button");
 
         let file_page = Self { vbox_files, container, list_box };
-        // refresh_links.connect_clicked(file_page.refresh_links());
-        // file_page.refresh_links();
         file_page.setup_auto_refresh();
         file_page
     }

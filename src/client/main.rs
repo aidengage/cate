@@ -28,15 +28,6 @@ lazy_static! {
     // static ref ADDR: Arc<Mutex<Ipv4Addr>> = Arc::new(Mutex::new(Ipv4Addr::new()))>>;
 }
 
-// const ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
-// const PULL_DIR: &str = Path::new(&ROOT_DIR).join("pull").to_str().unwrap();
-// const PUSH_DIR: &str = Path::new(&ROOT_DIR).join("push").to_str().unwrap();
-
-// const PULL_DIR: &str = "/Users/aidengage/dev/senior/cate/pull/";
-// const PULL_DIR: String = ROOT_DIR + "pull";
-
-// const PUSH_DIR: &str = "/Users/aidengage/dev/senior/cate/push/";
-// const PUSH_DIR: String = ROOT_DIR + "push";
 
 // const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
 // const ADDR: Ipv4Addr = Ipv4Addr::new(172, 17, 0, 2);
@@ -90,7 +81,6 @@ impl Carbon {
         let setting = SettingPage::new(&self.page_stack);
 
         // Add pages to stack
-        // self.page_stack.add_named(&home.vbox_home, Some("home-page"));
         self.page_stack.add_named(&home.overlay, Some("home-page"));
         self.page_stack.add_named(&file.vbox_files, Some("file-page"));
         self.page_stack.add_named(&setting.vbox_settings, Some("setting-page"));
