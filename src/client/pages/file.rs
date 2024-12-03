@@ -1,15 +1,13 @@
 use gtk::prelude::*;
 use gtk::{Label, Stack, Button, Box, Orientation, ListBox, ScrolledWindow, PolicyType, gdk, GestureClick, glib};
-use gdk::Clipboard;
-use std::fs::{File, OpenOptions};
-use std::io::{BufRead, BufReader, Write};
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::time::Duration;
 use glib::ControlFlow;
 use crate::LINK_FILE;
 
 pub struct FilePage {
     pub vbox_files: Box,
-    pub container: Box,
     pub list_box: ListBox,
 }
 
@@ -55,7 +53,7 @@ impl FilePage {
         });
         button_home.add_css_class("custom-button");
 
-        let file_page = Self { vbox_files, container, list_box };
+        let file_page = Self { vbox_files, list_box };
         file_page.setup_auto_refresh();
         file_page
     }

@@ -1,4 +1,4 @@
-use std::{env, fs, io};
+use std::fs;
 use std::fs::File;
 use std::fs::metadata;
 use std::io::{BufWriter, Read, Write};
@@ -8,17 +8,9 @@ use std::net::{TcpStream};
 use std::path::Path;
 use std::io::Result;
 use std::fs::OpenOptions;
+use std::mem;
 
-use gtk::prelude::*;
-
-use crate::{PULL_DIR, PUSH_DIR, ADDR, PORT, LINK_FILE, USER_DOMAIN};
-fn check_file(file_path: &str) -> bool {
-    if let Ok(_file) = File::open(file_path) {
-        true
-    } else {
-        false
-    }
-}
+use crate::{PULL_DIR, PUSH_DIR, PORT, LINK_FILE, USER_DOMAIN, USER_IP};
 
 fn dir_to_vec(file_path: String) -> Vec<u8> {
     let clean_path: String = file_path.clone().trim().to_string();
@@ -92,7 +84,6 @@ pub fn move_file(file_path: String) {
 }
 
 pub fn send_file() -> Result<()> {
-    println!("in send_file");
 
     let paths = fs::read_dir(&*PULL_DIR.as_str())?;
     for path in paths {
@@ -103,7 +94,10 @@ pub fn send_file() -> Result<()> {
         if file_name.as_bytes()[0] as char != '.' {
             let name_of_file = file_name.clone();
             // println!("name of file: {}", name_of_file);
-            if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
+            let user_ip_clone = USER_IP.clone();
+            let ip = user_ip_clone.lock().unwrap();
+            if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(*ip, PORT)) {
+                mem::drop(ip);
                 println!("Connected to the server on {:?}", stream.peer_addr()?);
 
                 let full_path = PULL_DIR.to_string() + name_of_file.as_str();
@@ -172,7 +166,7 @@ fn receive_link(mut stream: TcpStream) {
     println!("extracted: {:?}", extracted_domain);
     let domain = remove_spaces(extracted_domain.clone());
     println!("domain: {}", domain);
-    let link = create_link(domain, message);
+    let link = create_link(domain, message, );
     append_file(LINK_FILE.to_string(), link.as_str()).expect("failed to write to file");
 }
 
@@ -189,9 +183,11 @@ fn append_file(file_path: String, content: &str) -> Result<()> {
 }
 
 fn create_link(domain: String, cat_link: String) -> String {
+    let user_ip_clone = USER_IP.clone();
+    let ip = user_ip_clone.lock().unwrap();
     let mut link = String::new();
     if domain == "" {
-        link.push_str(ADDR.to_string().as_str());
+        link.push_str(&*ip.to_string().as_str());
         link.push_str(&cat_link);
     } else {
         link.push_str(&domain);

@@ -1,12 +1,10 @@
 use std::path::PathBuf;
 
 use gtk::prelude::*;
-use gtk::{gdk, DropTarget, Label, Stack, Button, Box, Orientation, CssProvider, Align, Justification, Overlay};
+use gtk::{gdk, DropTarget, Label, Stack, Button, Box, Orientation, Align, Justification, Overlay};
 use crate::{sender, USER_DOMAIN};
 
 pub struct HomePage {
-    pub vbox_home: Box,
-    pub container: Box,
     pub overlay: Overlay,
 }
 
@@ -105,51 +103,13 @@ impl HomePage {
 
         // debug button to print domain name from setting page
         button_domain.connect_clicked(move |_| {
-            let mut domain = USER_DOMAIN.lock().unwrap();
+            let domain = USER_DOMAIN.lock().unwrap();
             println!("domain: {}", *domain);
         });
         button_domain.add_css_class("custom-button");
 
         vbox_home.add_controller(drop);
 
-        Self { vbox_home, container, overlay }
-    }
-
-    fn generate_nav() -> gtk::Box {
-        let container = Box::new(Orientation::Vertical, 0);
-        let nav_bar = Box::new(Orientation::Horizontal, 0);
-
-        let button_settings = Button::new();
-        let button_files = Button::new();
-
-        button_settings.add_css_class("custom-button");
-        button_files.add_css_class("custom-button");
-
-        button_settings.set_size_request(10, 10);
-        button_settings.set_hexpand(false);
-        button_settings.set_vexpand(false);
-
-        button_settings.set_halign(Align::Start);
-        button_settings.set_valign(Align::Center);
-
-        button_files.set_size_request(10, 10);
-        button_files.set_hexpand(false);
-        button_files.set_vexpand(false);
-
-        button_files.set_halign(Align::End);
-        button_files.set_valign(Align::Center);
-
-        nav_bar.set_halign(Align::Center);
-
-        let button_text = Label::builder()
-            // .label("S")
-            .build();
-
-        button_text.add_css_class("button-text");
-        container.append(&button_text);
-        nav_bar.append(&button_settings);
-        nav_bar.append(&button_files);
-
-        nav_bar
+        Self { overlay }
     }
 }

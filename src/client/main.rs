@@ -1,21 +1,14 @@
 mod sender;
 mod pages;
-
-use std::cell::RefCell;
 use pages::{home::HomePage, file::FilePage, setting::SettingPage};
-
 use std::net::Ipv4Addr;
-
 use gdk::Display;
 use gtk::prelude::*;
 use gtk::{gdk, Application, ApplicationWindow, CssProvider, Stack, Box, StackSwitcher, Orientation};
-
-use std::env;
-use std::path::{Path, PathBuf};
-use std::rc::Rc;
+use std::{env, fs, io};
+use std::path::Path;
 use std::string::ToString;
 use lazy_static::lazy_static;
-
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -25,19 +18,11 @@ lazy_static! {
     static ref PUSH_DIR: String = Path::new(&*ROOT_DIR).join("push/").to_str().unwrap().to_string();
     static ref LINK_FILE: String = Path::new(&*ROOT_DIR).join("assets/links.txt").to_str().unwrap().to_string();
     static ref USER_DOMAIN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
-    // static ref ADDR: Arc<Mutex<Ipv4Addr>> = Arc::new(Mutex::new(Ipv4Addr::new()))>>;
+    static ref USER_IP: Arc<Mutex<Ipv4Addr>> = Arc::new(Mutex::new(Ipv4Addr::new(0, 0, 0, 0)));
 }
 
-
-// const ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
-// const ADDR: Ipv4Addr = Ipv4Addr::new(172, 17, 0, 2);
-const ADDR: Ipv4Addr = Ipv4Addr::new(74,130,78,72);
-
-// docker localhost address, dont need to specify here, keep 127, 0, 0, 1 when sending to local docker
 const PORT: u16 = 8000;
 const APP_ID: &str = "com.aidengage.carbon";
-
-
 
 ////////////////////////////////////////////
 //         some weird file stuff          //
@@ -53,7 +38,6 @@ impl Carbon {
         // Create the main window
         let window = ApplicationWindow::new(app);
         window.set_title(Some("Carbon"));
-        // window.set_default_size(800, 600);
         window.set_default_size(350, 200);
 
         // Create the stack for managing pages
@@ -81,13 +65,15 @@ impl Carbon {
         let setting = SettingPage::new(&self.page_stack);
 
         // Add pages to stack
+        self.page_stack.add_named(&setting.vbox_settings, Some("setting-page"));
         self.page_stack.add_named(&home.overlay, Some("home-page"));
         self.page_stack.add_named(&file.vbox_files, Some("file-page"));
-        self.page_stack.add_named(&setting.vbox_settings, Some("setting-page"));
     }
 }
 
 fn main() {
+    create_push_pull().expect("could not create directories");
+    
     let app = Application::builder()
         .application_id(APP_ID)
         .build();
@@ -95,6 +81,24 @@ fn main() {
     app.connect_startup(|_| apply_css());
     app.connect_activate(create_ui);
     app.run();
+}
+
+fn create_push_pull() -> io::Result<()> {
+    match fs::create_dir(&*PULL_DIR) {
+        Ok(_) => println!("pull dir created"),
+        Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
+            println!("dir already exists");
+        }
+        Err(e) => return Err(e),
+    }
+    match fs::create_dir_all(&*PUSH_DIR) {
+        Ok(_) => println!("push dir created"),
+        Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
+            println!("dir already exists");
+        }
+        Err(e) => return Err(e),
+    }
+    Ok(())
 }
 
 fn create_ui(app: &Application) {
