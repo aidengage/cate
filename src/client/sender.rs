@@ -58,6 +58,7 @@ fn vec_to_discard(vec: Vec<u8>, file_name: String) {
         let mut file = File::create(PUSH_DIR.to_string() + file_name.as_str()).unwrap();
         // let mut file = File::create(PUSH_DIR.join(file_name.to_string())).unwrap(); // test
         file.write_all(&vec).unwrap();
+        remove_file(PUSH_DIR.to_string() + file_name.as_str());
     }
 }
 
@@ -225,7 +226,9 @@ fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     // let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
     // file.write(message.as_bytes()).unwrap();
     let extracted_domain = USER_DOMAIN.lock().unwrap();
+    println!("extracted: {:?}", extracted_domain);
     let domain = extracted_domain.clone();
+    println!("domain: {}", domain);
     let link = create_link(domain, message);
     append_file(LINK_FILE.to_string(), link.as_str()).expect("failed to write to file");
     // append_file("../../../assets/links.txt", message.as_str()).expect("failed to write to file");
@@ -266,8 +269,14 @@ fn append_file(file_path: String, content: &str) -> Result<()> {
 
 fn create_link(domain: String, cat_link: String) -> String {
     let mut link = String::new();
-    link.push_str(&domain);
-    link.push_str(&cat_link);
+    if domain == "" {
+        link.push_str(ADDR.to_string().as_str());
+        link.push_str(&cat_link);
+    } else {
+        link.push_str(&domain);
+        link.push_str(&cat_link);
+    }
+    println!("created link: {}", link);
     link
 }
 
