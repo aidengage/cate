@@ -166,7 +166,7 @@ fn receive_link(mut stream: TcpStream) {
     println!("extracted: {:?}", extracted_domain);
     let domain = remove_spaces(extracted_domain.clone());
     println!("domain: {}", domain);
-    let link = create_link(domain, message, );
+    let link = create_link(domain, message);
     append_file(LINK_FILE.to_string(), link.as_str()).expect("failed to write to file");
 }
 

@@ -6,6 +6,7 @@ use gdk::Display;
 use gtk::prelude::*;
 use gtk::{gdk, Application, ApplicationWindow, CssProvider, Stack, Box, StackSwitcher, Orientation};
 use std::{env, fs, io};
+use std::fs::File;
 use std::path::Path;
 use std::string::ToString;
 use lazy_static::lazy_static;
@@ -16,6 +17,7 @@ lazy_static! {
     static ref ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
     static ref PULL_DIR: String = Path::new(&*ROOT_DIR).join("pull/").to_str().unwrap().to_string();
     static ref PUSH_DIR: String = Path::new(&*ROOT_DIR).join("push/").to_str().unwrap().to_string();
+    static ref LINK_DIR: String = Path::new(&*ROOT_DIR).join("assets/").to_str().unwrap().to_string();
     static ref LINK_FILE: String = Path::new(&*ROOT_DIR).join("assets/links.txt").to_str().unwrap().to_string();
     static ref USER_DOMAIN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
     static ref USER_IP: Arc<Mutex<Ipv4Addr>> = Arc::new(Mutex::new(Ipv4Addr::new(0, 0, 0, 0)));
@@ -72,7 +74,7 @@ impl Carbon {
 }
 
 fn main() {
-    create_push_pull().expect("could not create directories");
+    create_files_dirs().expect("could not create directories and files");
     
     let app = Application::builder()
         .application_id(APP_ID)
@@ -83,7 +85,7 @@ fn main() {
     app.run();
 }
 
-fn create_push_pull() -> io::Result<()> {
+fn create_files_dirs() -> io::Result<()> {
     match fs::create_dir(&*PULL_DIR) {
         Ok(_) => println!("pull dir created"),
         Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
@@ -95,6 +97,17 @@ fn create_push_pull() -> io::Result<()> {
         Ok(_) => println!("push dir created"),
         Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
             println!("dir already exists");
+        }
+        Err(e) => return Err(e),
+    }
+    match fs::create_dir(&*LINK_DIR) {
+        Ok(_) => {
+            println!("link dir created");
+            File::create(LINK_FILE.clone())?;
+        }
+        Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
+            println!("dir already exists");
+            // File::create(LINK_FILE.clone())?;
         }
         Err(e) => return Err(e),
     }
