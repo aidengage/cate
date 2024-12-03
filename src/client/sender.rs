@@ -1,5 +1,4 @@
-use std::{fs, io};
-use std::error::Error;
+use std::fs;
 use std::fs::File;
 use std::fs::metadata;
 use std::io::{BufWriter, Read, Write};
@@ -8,25 +7,14 @@ use std::net::Shutdown;
 use std::net::{TcpStream};
 use std::path::Path;
 use std::io::Result;
-use std::io::ErrorKind;
-
-use std::io::LineWriter;
 use std::fs::OpenOptions;
+use std::mem;
 
-use gtk::prelude::*;
-
-use crate::{PULL_DIR, DISCARD, ADDR, PORT};
-
-fn check_file(file_path: &str) -> bool {
-    if let Ok(_file) = File::open(file_path) {
-        true
-    } else {
-        false
-    }
-}
+use crate::{PULL_DIR, PUSH_DIR, PORT, LINK_FILE, USER_DOMAIN, USER_IP};
 
 fn dir_to_vec(file_path: String) -> Vec<u8> {
     let clean_path: String = file_path.clone().trim().to_string();
+    println!("Cleaning file: {}", clean_path);
     if Path::new(clean_path.as_str()).exists() {
         let file_contents: Vec<u8> = fs::read(clean_path).unwrap();
         file_contents
@@ -36,6 +24,8 @@ fn dir_to_vec(file_path: String) -> Vec<u8> {
 }
 
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
+    println!("in vec_to_file: {}", file_name);
+    println!("PULL_DIR: {}", *PULL_DIR);
     if vec.len() == 0 {
         return;
     } else {
@@ -48,9 +38,23 @@ fn vec_to_discard(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
         return;
     } else {
-        let mut file = File::create(DISCARD.to_string() + file_name.as_str()).unwrap();
+        let mut file = File::create(PUSH_DIR.to_string() + file_name.as_str()).unwrap();
+        // let mut file = File::create(PUSH_DIR.join(file_name.to_string())).unwrap(); // test
         file.write_all(&vec).unwrap();
+        remove_file(PUSH_DIR.to_string() + file_name.as_str());
     }
+}
+
+fn remove_spaces(file_name: String) -> String {
+    let mut processed_string = String::new();
+
+    for char in file_name.chars() {
+        if char != ' ' {
+            processed_string.push(char);
+        }
+    }
+
+    processed_string
 }
 
 fn remove_file(file_path: String) {
@@ -74,30 +78,26 @@ fn get_file_name(file_path: &String) -> String {
 
 // hmmmmm
 pub fn move_file(file_path: String) {
-    if check_file(&file_path) {
-        let file_vector = dir_to_vec(file_path.to_string());
-        vec_to_file(file_vector, get_file_name(&file_path));
-    } else {
-        println!("File does not exist");
-    }
+    println!("in move_file: {}", file_path.clone());
+    let file_vector = dir_to_vec(file_path.to_string());
+    vec_to_file(file_vector, get_file_name(&file_path));
 }
 
 pub fn send_file() -> Result<()> {
-    println!("Hello Client!");
-    // let mut progress_var = 0;
 
-    // let paths = fs::read_dir("/Users/aidengage/dev/senior/cate/file-for-upload/")?;
-    let paths = fs::read_dir(PULL_DIR)?;
+    let paths = fs::read_dir(&*PULL_DIR.as_str())?;
     for path in paths {
-        // println!("paths print");
         let directory = path?.path().display().to_string();
+        // println!("directory: {}", directory);
         let file_name = get_file_name(&directory);
+        // println!("file name: {}", file_name);
         if file_name.as_bytes()[0] as char != '.' {
-            // println!("if char");
             let name_of_file = file_name.clone();
-            println!("name of file: {}", name_of_file);
-            if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(ADDR, PORT)) {
-                println!("if connect");
+            // println!("name of file: {}", name_of_file);
+            let user_ip_clone = USER_IP.clone();
+            let ip = user_ip_clone.lock().unwrap();
+            if let Ok(mut stream) = TcpStream::connect(SocketAddrV4::new(*ip, PORT)) {
+                mem::drop(ip);
                 println!("Connected to the server on {:?}", stream.peer_addr()?);
 
                 let full_path = PULL_DIR.to_string() + name_of_file.as_str();
@@ -106,12 +106,6 @@ pub fn send_file() -> Result<()> {
                 match metadata(&full_path) {
                     Ok(metadata) => {
                         file_size = metadata.len();
-                        // if file_size > isize::MAX as u64 {
-                        //     println!("one of your files is too large (over {})", isize::MAX as u64);
-                        //     // shutdown causes issue when sending nothing
-                        //     stream.shutdown(Shutdown::Both).expect("shutdown call failed");
-                        //     continue;
-                        // }
                         println!("File size: {}", file_size);
                     }
                     Err(error) => {
@@ -126,6 +120,7 @@ pub fn send_file() -> Result<()> {
                 // println!("name vec: {:?}", name_vec);
                 stream.write_all(&name_vec)?;
                 let message = dir_to_vec(full_path.clone());
+                // let message = dir_to_vec(full_path.into_os_string().into_string().unwrap()); // test
 
                 let size_array = file_size.to_be_bytes().to_vec();
 
@@ -143,8 +138,6 @@ pub fn send_file() -> Result<()> {
                         vec_to_discard(message, name_of_file.clone());
                         remove_file(full_path.to_string());
                         receive_link(stream);
-                        // let link = receive_link(stream).0;//.expect("Failed to receive link");
-                        // println!("Received link: {}", link);
                     }
                 }
             } else {
@@ -159,58 +152,26 @@ pub fn send_file() -> Result<()> {
 //     receive from server     //
 /////////////////////////////////
 
-fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
-    // if check_connection(stream) {
-    // println!("in receive link method");
-    // println!("connected back to server after send");
+fn receive_link(mut stream: TcpStream) {
     let mut message_length_buffer = [0u8; 8];
-    // println!("message length buffer: {:?}", message_length_buffer);
-    // println!("debug 1");
     stream.read_exact(&mut message_length_buffer).expect("length issue");
 
-    // println!("message length buffer: {:?}", message_length_buffer);
-    // stream.read_to_end(&mut buffer);
-    // println!("debug 2");
     let message_length = u64::from_be_bytes(message_length_buffer);
-    // println!("Message length: {}", message_length);
     let mut message_buffer = vec![0u8; message_length as usize];
-    // println!("message buffer: {:?}", message_buffer);
-    // let mut message_buffer = vec![0u8; 17];
     stream.read_exact(&mut message_buffer).expect("link issue");
-    // println!("message buffer: {:?}", message_buffer);
 
-    // let message = String::from_utf8_lossy(&buffer).to_string();
-    // let message = String::from_utf8_lossy(&message_buffer).to_string();
     let message = String::from_utf8(message_buffer).unwrap();
     println!("link? {}", message);
-    // let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
-    // file.write(message.as_bytes()).unwrap();
-    append_file("/Users/aidengage/dev/senior/cate/assets/links.txt", message.as_str()).expect("failed to write to file");
-
-    // line writer
-    // let mut line_writer = LineWriter::new(file);
-    // line_writer.write_all(&message.as_bytes()).unwrap();
-    // line_writer.flush().unwrap();
-
-    // open options
-    // let mut append_file = OpenOptions::new()
-    //     .create(true)
-    //     .append(true)
-    //     .open("/Users/aidengage/dev/senior/cate/assets/links.txt");
-    // let writer = BufWriter::new(append_file);
-    // writeln!(writer, "{}", message.as_str()).expect("message not written");
-
-    // let mut link_file = File::open("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
-    // link_file.write(message.as_bytes()).unwrap();
-
-
-
-    // println!("message receive: {}", message);
-    /*(message, Ok(()))*/
+    let extracted_domain = USER_DOMAIN.lock().unwrap();
+    println!("extracted: {:?}", extracted_domain);
+    let domain = remove_spaces(extracted_domain.clone());
+    println!("domain: {}", domain);
+    let link = create_link(domain, message);
+    append_file(LINK_FILE.to_string(), link.as_str()).expect("failed to write to file");
 }
 
-fn append_file(file_path: &str, content: &str) -> Result<()> {
-    println!("content: {}", content);
+fn append_file(file_path: String, content: &str) -> Result<()> {
+    // println!("content: {}", content);
     // open options
     let append_file = OpenOptions::new()
         .create(true)
@@ -221,14 +182,17 @@ fn append_file(file_path: &str, content: &str) -> Result<()> {
     Ok(())
 }
 
-// fn check_connection(mut stream: TcpStream) -> Result<()> {
-//     match stream.write(&[0]) {
-//         Ok(_) => true,
-//         Err(e) if e.kind() == ErrorKind::ConnectionReset => {
-//             println!("Connection reset by peer");
-//             false
-//         }
-//         Err(_) => false, // Other errors may also indicate a lost connection
-//     }
-//     Ok(())
-// }
+fn create_link(domain: String, cat_link: String) -> String {
+    let user_ip_clone = USER_IP.clone();
+    let ip = user_ip_clone.lock().unwrap();
+    let mut link = String::new();
+    if domain == "" {
+        link.push_str(&*ip.to_string().as_str());
+        link.push_str(&cat_link);
+    } else {
+        link.push_str(&domain);
+        link.push_str(&cat_link);
+    }
+    println!("created link: {}", link);
+    link
+}

@@ -1,9 +1,9 @@
 use std::fs::File;
 use std::net::{SocketAddrV4, TcpListener, TcpStream};
-use std::{fs, thread};
+use std::thread;
 use std::io::{Read, Write};
 
-use crate::{ADDR, PORT, UPLOAD_DIR, PUB_ADDR};
+use crate::{ADDR, PORT, UPLOAD_DIR};
 
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
@@ -14,7 +14,7 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
     }
 }
 
-pub fn receive_file(/*mut file: &Vec<u8>*/) {
+pub fn receive_file() {
     let listener = TcpListener::bind(SocketAddrV4::new(ADDR, PORT)).unwrap();
     println!("{:?}", listener);
     for stream in listener.incoming() {
@@ -70,7 +70,7 @@ pub fn handle_client(mut stream: TcpStream) {
 
     vec_to_file(buffer, file_name.to_string());
     let tcp_clone = stream.try_clone().unwrap();
-    let link = generate_link(file_name);
+    let link = generate_half_link(file_name);
     send_link(tcp_clone, link);
 }
 
@@ -83,21 +83,6 @@ fn send_link(mut stream: TcpStream, link: String) {
     println!("message: {:?}", link);
     stream.write_all(&link_length.to_be_bytes()).expect("bang bang bang bang bang bang bang bang");
     stream.write_all(link.as_bytes()).expect("could not send file");
-}
-
-fn get_file_name(file_path: &String) -> String {
-    let mut reverse_file_name = String::new();
-
-    let reverse_path = file_path.chars().rev().collect::<String>();
-    for c in reverse_path.chars() {
-        if c != '/' {
-            reverse_file_name.push(c);
-        } else {
-            break;
-        }
-    }
-    let file_name = reverse_file_name.chars().rev().collect::<String>();
-    file_name
 }
 
 fn remove_spaces(file_name: String) -> String {
@@ -114,19 +99,10 @@ fn remove_spaces(file_name: String) -> String {
     processed_string
 }
 
-fn generate_link(file_name: String) -> String {
-    // let paths = fs::read_dir(UPLOAD_DIR);
-    // for path in paths {
-    //     let directory = path?.path().display().to_string();
-    //     let file_name = get_file_name(&directory);
-    //     if file_name.as_bytes()[0] as char != '.' {
-    //
-    //     }
-    // }
+fn generate_half_link(file_name: String) -> String {
     let processed_name = remove_spaces(file_name);
 
-    let link = PUB_ADDR.to_string() + "/files/" + processed_name.as_str();
+    let link = "/files/".to_owned() + processed_name.as_str();
     println!("link: {}", link);
     link
-    // Ok(())
 }
