@@ -224,8 +224,10 @@ fn receive_link(mut stream: TcpStream) /*-> (String, Result<()>)*/ {
     println!("link? {}", message);
     // let mut file = File::create("/Users/aidengage/dev/senior/cate/assets/links.txt").unwrap();
     // file.write(message.as_bytes()).unwrap();
-    // append_file("/Users/aidengage/dev/senior/cate/assets/links.txt", message.as_str()).expect("failed to write to file");
-    append_file(LINK_FILE.to_string(), message.as_str()).expect("failed to write to file");
+    let extracted_domain = USER_DOMAIN.lock().unwrap();
+    let domain = extracted_domain.clone();
+    let link = create_link(domain, message);
+    append_file(LINK_FILE.to_string(), link.as_str()).expect("failed to write to file");
     // append_file("../../../assets/links.txt", message.as_str()).expect("failed to write to file");
 
     // line writer
@@ -260,6 +262,13 @@ fn append_file(file_path: String, content: &str) -> Result<()> {
     let mut writer = BufWriter::new(append_file);
     writeln!(writer, "{}", content).expect("message not written");
     Ok(())
+}
+
+fn create_link(domain: String, cat_link: String) -> String {
+    let mut link = String::new();
+    link.push_str(&domain);
+    link.push_str(&cat_link);
+    link
 }
 
 // fn check_connection(mut stream: TcpStream) -> Result<()> {

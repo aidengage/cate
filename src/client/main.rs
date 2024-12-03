@@ -24,8 +24,8 @@ lazy_static! {
     static ref PULL_DIR: String = Path::new(&*ROOT_DIR).join("pull/").to_str().unwrap().to_string();
     static ref PUSH_DIR: String = Path::new(&*ROOT_DIR).join("push/").to_str().unwrap().to_string();
     static ref LINK_FILE: String = Path::new(&*ROOT_DIR).join("assets/links.txt").to_str().unwrap().to_string();
-    // static ref USER_DOMAIN: Rc<RefCell<String>> = Rc::new(RefCell::new(String::new()));
     static ref USER_DOMAIN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
+    // static ref ADDR: Arc<Mutex<Ipv4Addr>> = Arc::new(Mutex::new(Ipv4Addr::new()))>>;
 }
 
 // const ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
@@ -52,12 +52,12 @@ const APP_ID: &str = "com.aidengage.carbon";
 //         some weird file stuff          //
 ////////////////////////////////////////////
 
-pub struct App {
+pub struct Carbon {
     pub window: ApplicationWindow,
     pub page_stack: Stack,
 }
 
-impl App {
+impl Carbon {
     pub fn new(app: &Application) -> Self {
         // Create the main window
         let window = ApplicationWindow::new(app);
@@ -109,7 +109,7 @@ fn main() {
 
 fn create_ui(app: &Application) {
     // Create and initialize the app
-    let app = App::new(app);
+    let app = Carbon::new(app);
     app.init();
     app.window.present();
 }

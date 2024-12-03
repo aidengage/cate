@@ -70,7 +70,8 @@ pub fn handle_client(mut stream: TcpStream) {
 
     vec_to_file(buffer, file_name.to_string());
     let tcp_clone = stream.try_clone().unwrap();
-    let link = generate_link(file_name);
+    // let link = generate_link(file_name);
+    let link = generate_half_link(file_name);
     send_link(tcp_clone, link);
 }
 
@@ -129,4 +130,12 @@ fn generate_link(file_name: String) -> String {
     println!("link: {}", link);
     link
     // Ok(())
+}
+
+fn generate_half_link(file_name: String) -> String {
+    let processed_name = remove_spaces(file_name);
+
+    let link = "/files/".to_owned() + processed_name.as_str();
+    println!("link: {}", link);
+    link
 }

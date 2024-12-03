@@ -61,7 +61,7 @@ impl HomePage {
         nav_bar.set_halign(Align::Start);
 
         let button_text = Label::builder()
-            .label("S")
+            // .label("S")
             // .margin_top(10)
             // .margin_bottom(10)
             // .margin_start(10)
@@ -139,7 +139,7 @@ impl HomePage {
         button_domain.add_css_class("custom-button");
 
         vbox_home.add_controller(drop);
-        vbox_home.append(&button_domain);
+        // vbox_home.append(&button_domain);
 
         Self { vbox_home, container, overlay }
     }
