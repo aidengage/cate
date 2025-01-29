@@ -1,17 +1,22 @@
 mod receiver;
 
-use std::str;
-use std::net::{Ipv4Addr};
 use nix::unistd::Uid;
+use std::net::Ipv4Addr;
+use std::str;
 
 const UPLOAD_DIR: &str = "/var/www/html/files/";
 const ADDR: Ipv4Addr = Ipv4Addr::new(172, 17, 0, 2);
-// docker localhost apparently ^^
+// default docker localhost apparently ^^
 // const ADDR: Ipv4Addr = Ipv4Addr::new(192, 168, 1, 104);
 
 const PORT: u16 = 8000;
 
-fn main () {
+fn main() {
+    // checks if the program is run as root to allow the program
+    // to create files and directories essential for functionallity
+    //
+    // this check might not be needed if it is run in a docker
+    // container, although i have not tested this yet
     if !Uid::effective().is_root() {
         panic!("You must run this executable with root permissions");
     } else {

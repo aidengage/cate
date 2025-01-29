@@ -5,6 +5,9 @@ use std::io::{Read, Write};
 
 use crate::{ADDR, PORT, UPLOAD_DIR};
 
+// vec_to_file takes a vector of u8 data and a String file name
+// and IF the vector is NOT empty, create a new file with the
+// corresponding file name and naming format
 fn vec_to_file(vec: Vec<u8>, file_name: String) {
     if vec.len() == 0 {
         return;
@@ -14,6 +17,11 @@ fn vec_to_file(vec: Vec<u8>, file_name: String) {
     }
 }
 
+// receive_file runs and listens on the ADDR and PORT designated
+// in the server main file
+//
+// need to figure out multi threading i think?
+// the program freezes whenever i upload a file
 pub fn receive_file() {
     let listener = TcpListener::bind(SocketAddrV4::new(ADDR, PORT)).unwrap();
     println!("{:?}", listener);
