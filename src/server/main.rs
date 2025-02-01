@@ -14,12 +14,11 @@ const PORT: u16 = 8000;
 fn main() {
     // checks if the program is run as root to allow the program
     // to create files and directories essential for functionallity
-    //
-    // this check might not be needed if it is run in a docker
-    // container, although i have not tested this yet
     if !Uid::effective().is_root() {
         panic!("You must run this executable with root permissions");
     } else {
         receiver::receive_file();
     }
+    // this check might not be needed if it is run in a docker
+    // container, although i have not tested this yet
 }
