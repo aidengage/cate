@@ -1,24 +1,46 @@
-mod sender;
 mod pages;
-use pages::{home::HomePage, file::FilePage, setting::SettingPage};
-use std::net::Ipv4Addr;
+mod sender;
 use gdk::Display;
 use gtk::prelude::*;
-use gtk::{gdk, Application, ApplicationWindow, CssProvider, Stack, Box, StackSwitcher, Orientation};
-use std::{env, fs, io};
+use gtk::{
+    gdk, Application, ApplicationWindow, Box, CssProvider, Orientation, Stack, StackSwitcher,
+};
+use lazy_static::lazy_static;
+use pages::{file::FilePage, home::HomePage, setting::SettingPage};
 use std::fs::File;
+use std::net::Ipv4Addr;
 use std::path::Path;
 use std::string::ToString;
-use lazy_static::lazy_static;
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::{env, fs, io};
 
 lazy_static! {
-    static ref ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir().unwrap().to_str().unwrap().to_string());
-    static ref PULL_DIR: String = Path::new(&*ROOT_DIR).join("pull/").to_str().unwrap().to_string();
-    static ref PUSH_DIR: String = Path::new(&*ROOT_DIR).join("push/").to_str().unwrap().to_string();
-    static ref LINK_DIR: String = Path::new(&*ROOT_DIR).join("assets/").to_str().unwrap().to_string();
-    static ref LINK_FILE: String = Path::new(&*ROOT_DIR).join("assets/links.txt").to_str().unwrap().to_string();
+    static ref ROOT_DIR: String = env::var("PROJECT_ROOT").unwrap_or_else(|_| env::current_dir()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_string());
+    static ref PULL_DIR: String = Path::new(&*ROOT_DIR)
+        .join("pull/")
+        .to_str()
+        .unwrap()
+        .to_string();
+    static ref PUSH_DIR: String = Path::new(&*ROOT_DIR)
+        .join("push/")
+        .to_str()
+        .unwrap()
+        .to_string();
+    static ref LINK_DIR: String = Path::new(&*ROOT_DIR)
+        .join("assets/")
+        .to_str()
+        .unwrap()
+        .to_string();
+    static ref LINK_FILE: String = Path::new(&*ROOT_DIR)
+        .join("assets/links.txt")
+        .to_str()
+        .unwrap()
+        .to_string();
     static ref USER_DOMAIN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
     static ref USER_IP: Arc<Mutex<Ipv4Addr>> = Arc::new(Mutex::new(Ipv4Addr::new(0, 0, 0, 0)));
 }
@@ -67,18 +89,18 @@ impl Carbon {
         let setting = SettingPage::new(&self.page_stack);
 
         // Add pages to stack
-        self.page_stack.add_named(&setting.vbox_settings, Some("setting-page"));
+        self.page_stack
+            .add_named(&setting.vbox_settings, Some("setting-page"));
         self.page_stack.add_named(&home.overlay, Some("home-page"));
-        self.page_stack.add_named(&file.vbox_files, Some("file-page"));
+        self.page_stack
+            .add_named(&file.vbox_files, Some("file-page"));
     }
 }
 
 fn main() {
     create_files_dirs().expect("could not create directories and files");
-    
-    let app = Application::builder()
-        .application_id(APP_ID)
-        .build();
+
+    let app = Application::builder().application_id(APP_ID).build();
 
     app.connect_startup(|_| apply_css());
     app.connect_activate(create_ui);
@@ -122,7 +144,6 @@ fn create_ui(app: &Application) {
 }
 
 fn apply_css() {
-
     let styling = CssProvider::new();
     styling.load_from_string(include_str!("./client.css"));
 

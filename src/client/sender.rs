@@ -1,16 +1,16 @@
 use std::fs;
-use std::fs::File;
 use std::fs::metadata;
-use std::io::{BufWriter, Read, Write};
-use std::net::SocketAddrV4;
-use std::net::Shutdown;
-use std::net::{TcpStream};
-use std::path::Path;
-use std::io::Result;
+use std::fs::File;
 use std::fs::OpenOptions;
+use std::io::Result;
+use std::io::{BufWriter, Read, Write};
 use std::mem;
+use std::net::Shutdown;
+use std::net::SocketAddrV4;
+use std::net::TcpStream;
+use std::path::Path;
 
-use crate::{PULL_DIR, PUSH_DIR, PORT, LINK_FILE, USER_DOMAIN, USER_IP};
+use crate::{LINK_FILE, PORT, PULL_DIR, PUSH_DIR, USER_DOMAIN, USER_IP};
 
 fn dir_to_vec(file_path: String) -> Vec<u8> {
     let clean_path: String = file_path.clone().trim().to_string();
@@ -84,7 +84,6 @@ pub fn move_file(file_path: String) {
 }
 
 pub fn send_file() -> Result<()> {
-
     let paths = fs::read_dir(&*PULL_DIR.as_str())?;
     for path in paths {
         let directory = path?.path().display().to_string();
@@ -127,9 +126,10 @@ pub fn send_file() -> Result<()> {
                 stream.write(&size_array)?;
 
                 match message[..] {
-
                     // "#END#" => stream.shutdown(Shutdown::Both).expect("Shutdown Failed!"),
-                    [] => stream.shutdown(Shutdown::Both).expect("shutdown call failed"),
+                    [] => stream
+                        .shutdown(Shutdown::Both)
+                        .expect("shutdown call failed"),
                     _ => {
                         println!("SENT!");
                         stream.write(&message)?;
@@ -154,7 +154,9 @@ pub fn send_file() -> Result<()> {
 
 fn receive_link(mut stream: TcpStream) {
     let mut message_length_buffer = [0u8; 8];
-    stream.read_exact(&mut message_length_buffer).expect("length issue");
+    stream
+        .read_exact(&mut message_length_buffer)
+        .expect("length issue");
 
     let message_length = u64::from_be_bytes(message_length_buffer);
     let mut message_buffer = vec![0u8; message_length as usize];
