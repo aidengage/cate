@@ -87,46 +87,56 @@ const PORT: u16 = 8000;
 const APP_ID: &str = "com.aidengage.carbon";
 
 ////////////////////////////////////////////
-//         some weird file stuff          //
+//         some weird gtk stuff          //
 ////////////////////////////////////////////
 
+// creates a struct to build the initial application structure
+// need to start with an ApplicationWindow at least
+// page_stack stores the different pages for the application, located in /pages/ folder
 pub struct Carbon {
     pub window: ApplicationWindow,
     pub page_stack: Stack,
 }
 
+//
 impl Carbon {
     pub fn new(app: &Application) -> Self {
-        // Create the main window
+        // creates the default window carbon uses to exist as an application
+        // setting the title of the menubar with set_title and size with set_default_size
         let window = ApplicationWindow::new(app);
         window.set_title(Some("Carbon"));
         window.set_default_size(350, 200);
 
-        // Create the stack for managing pages
+        // gtk uses a stack to store each page for your application, it only shows
+        // one child at a time and the user cant change which child is shown
         let page_stack = Stack::new();
 
-        // Create a stack switcher (tabs/navigation)
+        // a stack switcher is required to be able to change which child is shown
+        // typically used for tabs and navigation around the application
         let stack_switcher = StackSwitcher::new();
         stack_switcher.set_stack(Some(&page_stack));
 
-        // Create the main vertical box
+        // creates the default landing page for the application
+        // i believe is the ip and domain page
         let main_box = Box::new(Orientation::Vertical, 10);
+        // see if orientation matters actually
         main_box.append(&stack_switcher);
         main_box.append(&page_stack);
 
-        // Set up the window
+        // sets the default window for the user by adding it as a child
+        // to the window created earlier
         window.set_child(Some(&main_box));
 
         Self { window, page_stack }
     }
 
     pub fn init(&self) {
-        // Initialize pages
+        // creates home, file, and setting (landing) pages based on the page_stack
         let home = HomePage::new(&self.page_stack);
         let file = FilePage::new(&self.page_stack);
         let setting = SettingPage::new(&self.page_stack);
 
-        // Add pages to stack
+        // adds each page just created to the page_stack in order
         self.page_stack
             .add_named(&setting.vbox_settings, Some("setting-page"));
         self.page_stack.add_named(&home.overlay, Some("home-page"));
@@ -136,15 +146,22 @@ impl Carbon {
 }
 
 fn main() {
+    // runs create_files_dirs function to create all the necessary
+    // files and directories required for carbon to function
     create_files_dirs().expect("could not create directories and files");
 
+    // officially builds the application and sets its id
     let app = Application::builder().application_id(APP_ID).build();
 
+    // applies the css file in the working directory to style carbon correctly
+    // onces applied, the ui is created and the app is run
     app.connect_startup(|_| apply_css());
     app.connect_activate(create_ui);
     app.run();
 }
 
+// big stupid function i can probably optimize to work better
+// correctly check for directories and files and do what is needed
 fn create_files_dirs() -> io::Result<()> {
     match fs::create_dir(&*PULL_DIR) {
         Ok(_) => println!("pull dir created"),
