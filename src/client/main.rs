@@ -191,6 +191,8 @@ fn create_files_dirs() -> io::Result<()> {
     Ok(())
 }
 
+// boilerplate create_ui function, does what it needs
+// required to build the ui elements
 fn create_ui(app: &Application) {
     // Create and initialize the app
     let app = Carbon::new(app);
@@ -198,10 +200,18 @@ fn create_ui(app: &Application) {
     app.window.present();
 }
 
+// boilerplate apply_css function, needed to style the application
 fn apply_css() {
+    // need a styling variable to store the css information from
+    // client.css
     let styling = CssProvider::new();
+
+    // takes the client.css file that is within the directory and
+    // loads it onto the application with load_from_string
     styling.load_from_string(include_str!("./client.css"));
 
+    // this connects the display information with the styling variable
+    // i applied the client.css to
     gtk::style_context_add_provider_for_display(
         &Display::default().expect("Couldn't get default display"),
         &styling,
